@@ -83,7 +83,7 @@ StrokeMLP(input_dim=10, hidden_layers=[64, 32], dropout=0.3)
 
 ```bash
 # 1. Clone & enter project
-git clone https://github.com/<your-handle>/vena.git && cd vena
+git clone https://github.com/eneserbap/Vena.git && cd vena
 
 # 2. Install dependencies (uv required)
 uv sync
@@ -149,7 +149,7 @@ docker run --gpus all -v $(pwd)/data:/app/data vena-train:latest
 
 ## 🗺️ Roadmap
 
-### ✅ Phase 1 — Scaffolding *(Current)*
+### ✅ Phase 1 — Scaffolding
 - [x] Project structure (Cookiecutter MLOps standard)
 - [x] `StrokeMLP` model architecture
 - [x] Training loop with the Sacred Triplet (`zero_grad → backward → step`)
@@ -158,10 +158,10 @@ docker run --gpus all -v $(pwd)/data:/app/data vena-train:latest
 - [x] Two-layer cached Dockerfile
 - [x] Ruff + mypy + pytest infrastructure
 
-### 🔜 Phase 2 — Data Pipeline
-- [ ] Implement `data.py`: EDA, median BMI imputation, one-hot encoding, StandardScaler
+### 🔄 Phase 2 — Data Pipeline *(Current)*
+- [x] Implement `data.py`: EDA, median BMI imputation, one-hot encoding, StandardScaler
 - [ ] DVC remote storage setup (S3 / GCS)
-- [ ] Stratified train/test split (critical for 5% positive rate)
+- [x] Stratified train/test split (critical for 5% positive rate)
 - [ ] First end-to-end training run on real data
 
 ### 🔜 Phase 3 — Metrics & Observability
@@ -194,15 +194,9 @@ docker run --gpus all -v $(pwd)/data:/app/data vena-train:latest
 
 ## 👥 Authors
 
-| Name | Role |
-|------|------|
-| **Enes Erbap** | ML Engineer & MLOps Architect |
-| **Sudenur Hatkaoglu** | ML Engineer |
+
+| **Enes Erbap** 
+| **Sudenur Hatkaoglu**
 
 ---
 
-<div align="center">
-
-*Built with ❤️ as part of a Year 2 MLOps course project.*
-
-</div>

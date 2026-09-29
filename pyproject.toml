@@ -1,0 +1,90 @@
+[project]
+name = "vena"
+version = "0.1.0"
+description = "Vena — Stroke Risk Prediction via Tabular Deep Learning"
+authors = [
+    { name = "ENES ERBAP", email = "enes_er_bap@hotmail.com" },
+    { name = "SUDENUR HATKAOGLU" },
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "dvc>=3.67.1",
+    "hydra-core>=1.3.7",
+    "omegaconf>=2.3.1",
+    "pandas>=3.0.6",
+    "python-dotenv>=1.2.3",
+    "scikit-learn>=1.9.1",
+    "torch>=2.14.0",
+    "torchvision>=0.29.0",
+    "typer>=0.27.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.5.0",
+    "mypy>=1.10.0",
+    "pytest>=8.0.0",
+    "pytest-cov>=5.0.0",
+]
+
+# Register the CLI entry-point so `vena train` works after `uv sync` / `pip install -e .`
+[project.scripts]
+vena = "vena.__main__:app"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"
+
+# ─── Ruff — Linting & Formatting ──────────────────────────────────────────────
+# WHY ruff? Single tool replaces flake8 + isort + pyupgrade — orders of magnitude
+# faster and trivially integrated into pre-commit and CI.
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # Pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear (catches subtle bugs)
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade — enforces modern Python idioms
+    "N",   # pep8-naming
+    "ANN", # flake8-annotations — enforces type hints
+    "D",   # pydocstyle
+]
+ignore = [
+    "D100",   # Missing docstring in public module
+    "D104",   # Missing docstring in public package
+    "ANN101", # Missing type annotation for `self`
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+
+# ─── Mypy — Static Type Checking ──────────────────────────────────────────────
+# WHY strict mode? Catches entire classes of runtime errors at development time
+# rather than in production inference.
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+disallow_untyped_defs = true
+disallow_any_generics = true
+show_error_codes = true
+
+# ─── Pytest ───────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=src/vena --cov-report=term-missing -v"

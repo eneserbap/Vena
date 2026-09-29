@@ -1,0 +1,34 @@
+# ─── Docker Build Context Exclusions ─────────────────────────────────────────
+# WHY .dockerignore?
+#   Without it, `docker build` sends the entire project directory (including
+#   .venv, data/, and .git) to the Docker daemon — potentially GBs of
+#   unnecessary context.  This file keeps the build context tiny and fast.
+
+.git/
+.dvc/
+.venv/
+
+# Data is mounted at runtime via -v; never bake raw data into the image
+data/
+
+# Model outputs stay outside the image too
+outputs/
+multirun/
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE
+.idea/
+.vscode/
+.DS_Store
+
+# Tests (not needed at training runtime)
+tests/
+
+# Dev environment files
+.env
+*.md

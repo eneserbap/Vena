@@ -1,0 +1,15 @@
+# ─── DVC Ignore ───────────────────────────────────────────────────────────────
+# Files and directories that DVC should NOT track.
+# Uses the same glob syntax as .gitignore.
+
+# Python bytecode (never worth versioning)
+**/__pycache__
+**/*.pyc
+**/*.pyo
+
+# Virtual environment
+.venv/
+
+# IDE artefacts
+.idea/
+.vscode/

@@ -1,0 +1,52 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Hydra Configuration — conf/config.yaml
+#
+# WHY Hydra?
+#   Hydra lets us compose, override, and sweep configurations from the CLI
+#   without changing a single line of Python.  Every hyperparameter lives here
+#   so the code remains environment-agnostic and fully reproducible.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Data ──────────────────────────────────────────────────────────────────────
+data:
+  raw_path: "data/raw/healthcare-dataset-stroke-data.csv"
+  processed_dir: "data/processed"
+  # Fraction of data used for the test split (stratified on the label)
+  test_size: 0.2
+  # Controls random state for reproducible splits across runs
+  random_seed: 42
+  # Name of the binary label column in the raw CSV
+  target_column: "stroke"
+  # Columns to drop before feature engineering (non-informative identifiers)
+  drop_columns:
+    - "id"
+
+# ── Model ─────────────────────────────────────────────────────────────────────
+model:
+  # Number of input features after preprocessing (update after EDA in Phase 2)
+  input_dim: 10
+  # Neuron counts for each hidden layer — drives the MLP constructor dynamically
+  hidden_layers:
+    - 64
+    - 32
+  # Output dim is 1 for binary classification with BCEWithLogitsLoss
+  output_dim: 1
+  # Dropout probability applied after every hidden layer to regularise training
+  dropout: 0.3
+
+# ── Training ──────────────────────────────────────────────────────────────────
+training:
+  learning_rate: 1.0e-3
+  batch_size: 64
+  epochs: 50
+  # Patience for early stopping (Phase 2); defined here so it's never hardcoded
+  early_stopping_patience: 10
+  # Weight for positive class to counteract the stroke/no-stroke class imbalance
+  pos_weight: 9.0
+
+# ── Logging & Artefacts ───────────────────────────────────────────────────────
+artefacts:
+  # Directory where trained model checkpoints are saved
+  checkpoint_dir: "outputs/checkpoints"
+  # Filename for the best model snapshot
+  best_model_name: "vena_best.pt"
