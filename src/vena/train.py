@@ -241,8 +241,10 @@ def run_training(cfg: "DictConfig") -> None:
     )
 
     # ── Model ─────────────────────────────────────────────────────────────────
+    # We dynamically read input_dim from the preprocessed data shape (X_train)
+    # instead of hardcoding it in the config, to prevent dimension mismatch errors.
     model = StrokeMLP(
-        input_dim=cfg.model.input_dim,
+        input_dim=X_train.shape[1],
         hidden_layers=list(cfg.model.hidden_layers),
         output_dim=cfg.model.output_dim,
         dropout=cfg.model.dropout,

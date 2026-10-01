@@ -158,13 +158,13 @@ docker run --gpus all -v $(pwd)/data:/app/data vena-train:latest
 - [x] Two-layer cached Dockerfile
 - [x] Ruff + mypy + pytest infrastructure
 
-### 🔄 Phase 2 — Data Pipeline *(Current)*
+### ✅ Phase 2 — Data Pipeline
 - [x] Implement `data.py`: EDA, median BMI imputation, one-hot encoding, StandardScaler
-- [ ] DVC remote storage setup (S3 / GCS)
+- [x] DVC remote storage setup (Local fallback due to Azure limits)
 - [x] Stratified train/test split (critical for 5% positive rate)
-- [ ] First end-to-end training run on real data
+- [x] First end-to-end training run on real data
 
-### 🔜 Phase 3 — Metrics & Observability
+### 🔄 Phase 3 — Metrics & Observability *(Current)*
 - [ ] Replace accuracy with **AUROC, F1, Precision, Recall** (imbalanced dataset)
 - [ ] MLflow experiment tracking (metrics, params, artefacts per run)
 - [ ] Early stopping with configurable patience
