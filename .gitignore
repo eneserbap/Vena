@@ -15,9 +15,7 @@ build/
 .venv/
 
 # ─── Data (tracked by DVC, NOT by Git) ────────────────────────────────────────
-# DVC will manage these directories; only the .dvc pointer files are committed.
-data/raw/
-data/processed/
+# DVC will manage these directories by generating its own .gitignore files.
 
 # ─── Model Artefacts ──────────────────────────────────────────────────────────
 *.pt
