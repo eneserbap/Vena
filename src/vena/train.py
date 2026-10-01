@@ -1,22 +1,10 @@
 """Vena — Training Loop (train.py).
 
-WHY a separate module?
-  SRP: this module owns the *training contract* — the optimiser, loss,
-  metric collection, and checkpointing.  It does not build the model, load
-  data, or parse configuration; those responsibilities live in model.py,
-  data.py, and main.py respectively.
-
-  DIP (Dependency Inversion): the public ``train_one_epoch`` and ``evaluate``
-  functions accept abstract ``DataLoader`` and ``nn.Module`` interfaces, not
-  concrete implementations.  This makes them trivially testable with mock
-  objects and swappable models.
-
-The "Kutsal Üçlü" (Sacred Triplet):
-  Every gradient-based update follows the exact three-step PyTorch ritual:
-    1. ``optimizer.zero_grad()`` — clear stale gradients from the previous step
-    2. ``loss.backward()``       — backpropagate the loss through the graph
-    3. ``optimizer.step()``      — update parameters via the gradient signal
-  Skipping or reordering any step silently corrupts training without errors.
+Phase 3 Additions:
+  - Integration with MLflow for tracking metrics, hyperparameters, and models.
+  - Implemented advanced metrics (AUROC, F1, Precision, Recall) using scikit-learn
+    because Accuracy is highly misleading for imbalanced datasets (~5% positive).
+  - Added Early Stopping mechanism to prevent overfitting.
 """
 
 from __future__ import annotations
@@ -25,8 +13,11 @@ import logging
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import mlflow
+import mlflow.pytorch
 import torch
 import torch.nn as nn
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score  # type: ignore[import]
 from torch.utils.data import DataLoader, TensorDataset
 
 if TYPE_CHECKING:
@@ -41,18 +32,6 @@ logger = logging.getLogger(__name__)
 
 
 def resolve_device() -> torch.device:
-    """Select the best available compute device at runtime.
-
-    Priority order: CUDA → MPS → CPU.
-
-    WHY dynamic resolution?
-      The same code runs on a developer's MacBook (MPS), a CI runner (CPU),
-      and a cloud GPU VM (CUDA) without any code changes.  The device is
-      never hardcoded — it is always derived from the environment.
-
-    Returns:
-        The best available ``torch.device``.
-    """
     if torch.cuda.is_available():
         device = torch.device("cuda")
     elif torch.backends.mps.is_available():
@@ -76,44 +55,18 @@ def train_one_epoch(
     optimizer: torch.optim.Optimizer,
     device: torch.device,
 ) -> float:
-    """Run one full pass over the training set.
-
-    The Kutsal Üçlü lives here — see module docstring for explanation.
-
-    Args:
-        model: The neural network in *training* mode (``model.train()``
-            is called internally).
-        loader: Mini-batch iterator over the training ``TensorDataset``.
-        criterion: Loss function (``BCEWithLogitsLoss`` recommended for
-            binary classification with class-imbalance weighting).
-        optimizer: Parameter update rule (``Adam`` recommended as starting
-            point; can be swapped via config in Phase 2).
-        device: Compute device — tensors are moved here before forward pass.
-
-    Returns:
-        Mean training loss averaged over all mini-batches in this epoch.
-    """
     model.train()
     total_loss = 0.0
 
     for X_batch, y_batch in loader:
-        # Move tensors to device — no-op if already there
         X_batch = X_batch.to(device)
         y_batch = y_batch.to(device)
 
         # ── Kutsal Üçlü ──────────────────────────────────────────────────────
-        # 1. Clear gradients accumulated from the previous mini-batch.
-        #    ``set_to_none=True`` is faster than zeroing (avoids memory write).
         optimizer.zero_grad(set_to_none=True)
-
-        # 2. Forward pass → compute logits and loss
         logits = model(X_batch)
         loss = criterion(logits, y_batch)
-
-        # 3. Backward pass → accumulate gradients in .grad attributes
         loss.backward()
-
-        # 4. Parameter update via accumulated gradients
         optimizer.step()
         # ─────────────────────────────────────────────────────────────────────
 
@@ -127,27 +80,14 @@ def evaluate(
     loader: DataLoader[TensorDataset],
     criterion: nn.Module,
     device: torch.device,
-) -> tuple[float, float]:
-    """Evaluate model on a held-out split without updating parameters.
-
-    WHY ``torch.no_grad()``?
-      Disables the autograd engine — no computation graph is built, saving
-      both memory and compute.  Essential during evaluation/inference.
-
-    Args:
-        model: The neural network; switched to ``eval()`` mode internally
-            (disables Dropout and uses running BatchNorm statistics).
-        loader: Mini-batch iterator over the evaluation ``TensorDataset``.
-        criterion: Same loss function used in training for consistency.
-        device: Compute device.
-
-    Returns:
-        Tuple of ``(mean_loss, accuracy)`` over the full evaluation set.
-    """
+) -> tuple[float, float, float, float, float, float]:
+    """Evaluate model and return advanced classification metrics."""
     model.eval()
     total_loss = 0.0
-    correct = 0
-    total = 0
+    
+    all_targets = []
+    all_preds = []
+    all_probs = []
 
     with torch.no_grad():
         for X_batch, y_batch in loader:
@@ -158,14 +98,28 @@ def evaluate(
             loss = criterion(logits, y_batch)
             total_loss += loss.item()
 
-            # Convert raw logit → binary prediction via 0.5 threshold
-            preds = (torch.sigmoid(logits) >= 0.5).float()
-            correct += (preds == y_batch).sum().item()
-            total += y_batch.numel()
+            # Probabilities and hard predictions
+            probs = torch.sigmoid(logits)
+            preds = (probs >= 0.5).float()
+            
+            all_targets.extend(y_batch.cpu().numpy())
+            all_preds.extend(preds.cpu().numpy())
+            all_probs.extend(probs.cpu().numpy())
 
     mean_loss = total_loss / len(loader)
-    accuracy = correct / total
-    return mean_loss, accuracy
+    
+    # Calculate Phase 3 Metrics
+    acc = accuracy_score(all_targets, all_preds)
+    f1 = f1_score(all_targets, all_preds, zero_division=0)
+    prec = precision_score(all_targets, all_preds, zero_division=0)
+    rec = recall_score(all_targets, all_preds, zero_division=0)
+    
+    try:
+        auroc = roc_auc_score(all_targets, all_probs)
+    except ValueError:
+        auroc = 0.5  # Fallback if only one class is present in the batch
+
+    return mean_loss, acc, f1, prec, rec, auroc
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -180,23 +134,6 @@ def save_checkpoint(
     checkpoint_dir: str | Path,
     filename: str,
 ) -> Path:
-    """Persist model weights to disk as a ``.pt`` checkpoint.
-
-    WHY ``state_dict`` instead of pickling the whole model?
-      ``state_dict`` is version-stable: it survives code refactors as long as
-      layer names remain consistent.  Pickling the model object couples the
-      checkpoint to the Python class definition, making future loading brittle.
-
-    Args:
-        model: Trained ``nn.Module`` whose weights we want to persist.
-        epoch: Current epoch number, stored in the checkpoint for traceability.
-        val_loss: Validation loss at checkpoint time (useful for resuming).
-        checkpoint_dir: Directory where the ``.pt`` file will be written.
-        filename: Name of the checkpoint file (e.g., ``"vena_best.pt"``).
-
-    Returns:
-        Absolute path to the written checkpoint file.
-    """
     save_dir = Path(checkpoint_dir)
     save_dir.mkdir(parents=True, exist_ok=True)
 
@@ -209,22 +146,11 @@ def save_checkpoint(
         },
         checkpoint_path,
     )
-    logger.info("Checkpoint saved → %s  (epoch=%d, val_loss=%.4f)", checkpoint_path, epoch, val_loss)
+    logger.info("Checkpoint saved → %s", checkpoint_path)
     return checkpoint_path
 
 
 def run_training(cfg: "DictConfig") -> None:
-    """Orchestrate the full training pipeline from a Hydra config.
-
-    This function is the *composition root* for training: it wires together
-    data loading, model instantiation, loss / optimiser construction, the
-    epoch loop, and checkpointing.  All hyperparameters come from ``cfg``.
-
-    Args:
-        cfg: Hydra ``DictConfig`` object resolved from ``conf/config.yaml``
-            (plus any CLI overrides).  Contains sub-keys:
-            ``data``, ``model``, ``training``, ``artefacts``.
-    """
     from vena.data import build_dataloaders, load_raw_data, preprocess, split_and_scale
     from vena.model import StrokeMLP
 
@@ -241,8 +167,6 @@ def run_training(cfg: "DictConfig") -> None:
     )
 
     # ── Model ─────────────────────────────────────────────────────────────────
-    # We dynamically read input_dim from the preprocessed data shape (X_train)
-    # instead of hardcoding it in the config, to prevent dimension mismatch errors.
     model = StrokeMLP(
         input_dim=X_train.shape[1],
         hidden_layers=list(cfg.model.hidden_layers),
@@ -250,37 +174,77 @@ def run_training(cfg: "DictConfig") -> None:
         dropout=cfg.model.dropout,
     ).to(device)
 
-    # ── Loss — weighted for class imbalance ───────────────────────────────────
-    # WHY BCEWithLogitsLoss?
-    #   Numerically more stable than BCE(sigmoid(logit)) because it uses the
-    #   log-sum-exp trick internally.  ``pos_weight`` penalises missing positive
-    #   (stroke) examples more heavily to combat the ≈5 % positive rate.
     pos_weight = torch.tensor([cfg.training.pos_weight], device=device)
     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
-
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.training.learning_rate)
 
-    # ── Epoch Loop ────────────────────────────────────────────────────────────
+    # ── MLflow Setup ──────────────────────────────────────────────────────────
+    # Save MLflow data locally using a SQLite database at the project root
+    mlflow_db_path = Path(cfg.artefacts.checkpoint_dir).parent.parent / "mlflow.db"
+    mlflow.set_tracking_uri(f"sqlite:///{mlflow_db_path.absolute()}")
+    mlflow.set_experiment("vena_stroke_prediction")
+
+    # ── Epoch Loop with Early Stopping ────────────────────────────────────────
     best_val_loss = float("inf")
+    patience = cfg.training.early_stopping_patience
+    patience_counter = 0
 
-    for epoch in range(1, cfg.training.epochs + 1):
-        train_loss = train_one_epoch(model, train_loader, criterion, optimizer, device)
-        val_loss, val_acc = evaluate(model, test_loader, criterion, device)
+    with mlflow.start_run(run_name="StrokeMLP_Run"):
+        # Log configuration parameters
+        mlflow.log_params({
+            "learning_rate": cfg.training.learning_rate,
+            "batch_size": cfg.training.batch_size,
+            "pos_weight": cfg.training.pos_weight,
+            "epochs": cfg.training.epochs,
+            "hidden_layers": str(list(cfg.model.hidden_layers)),
+            "dropout": cfg.model.dropout,
+            "input_dim": X_train.shape[1],
+        })
 
-        logger.info(
-            "Epoch %03d | train_loss=%.4f | val_loss=%.4f | val_acc=%.4f",
-            epoch, train_loss, val_loss, val_acc,
-        )
-
-        # ── Best-model checkpointing ───────────────────────────────────────────
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
-            save_checkpoint(
-                model=model,
-                epoch=epoch,
-                val_loss=val_loss,
-                checkpoint_dir=cfg.artefacts.checkpoint_dir,
-                filename=cfg.artefacts.best_model_name,
+        for epoch in range(1, cfg.training.epochs + 1):
+            train_loss = train_one_epoch(model, train_loader, criterion, optimizer, device)
+            val_loss, val_acc, val_f1, val_prec, val_rec, val_auroc = evaluate(
+                model, test_loader, criterion, device
             )
 
-    logger.info("Training complete. Best val_loss=%.4f", best_val_loss)
+            # Log metrics per epoch
+            mlflow.log_metrics({
+                "train_loss": train_loss,
+                "val_loss": val_loss,
+                "val_accuracy": val_acc,
+                "val_f1": val_f1,
+                "val_precision": val_prec,
+                "val_recall": val_rec,
+                "val_auroc": val_auroc,
+            }, step=epoch)
+
+            logger.info(
+                "Epoch %03d | train_loss=%.4f | val_loss=%.4f | val_f1=%.4f | val_auroc=%.4f",
+                epoch, train_loss, val_loss, val_f1, val_auroc
+            )
+
+            # Checkpoint & Early Stopping logic
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                patience_counter = 0
+                checkpoint_path = save_checkpoint(
+                    model=model,
+                    epoch=epoch,
+                    val_loss=val_loss,
+                    checkpoint_dir=cfg.artefacts.checkpoint_dir,
+                    filename=cfg.artefacts.best_model_name,
+                )
+                
+                # Log the best model directly to MLflow with a signature
+                mlflow.pytorch.log_model(
+                    model, 
+                    "best_model", 
+                    input_example=X_train.iloc[:1].to_numpy(dtype="float32")
+                )
+            else:
+                patience_counter += 1
+                if patience_counter >= patience:
+                    logger.warning("Erken durdurma (Early Stopping) devreye girdi! Epoch: %d", epoch)
+                    break
+
+        logger.info("Training complete. Best val_loss=%.4f", best_val_loss)

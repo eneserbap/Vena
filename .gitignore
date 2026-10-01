@@ -22,6 +22,8 @@ build/
 *.pth
 outputs/        # Hydra output directory
 multirun/       # Hydra multirun output directory
+mlruns/         # MLflow artifacts directory
+mlflow.db       # MLflow SQLite database
 
 # ─── IDE & OS ─────────────────────────────────────────────────────────────────
 .idea/

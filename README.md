@@ -164,12 +164,12 @@ docker run --gpus all -v $(pwd)/data:/app/data vena-train:latest
 - [x] Stratified train/test split (critical for 5% positive rate)
 - [x] First end-to-end training run on real data
 
-### 🔄 Phase 3 — Metrics & Observability *(Current)*
-- [ ] Replace accuracy with **AUROC, F1, Precision, Recall** (imbalanced dataset)
-- [ ] MLflow experiment tracking (metrics, params, artefacts per run)
-- [ ] Early stopping with configurable patience
+### ✅ Phase 3 — Metrics & Observability
+- [x] Replace accuracy with **AUROC, F1, Precision, Recall** (imbalanced dataset)
+- [x] MLflow experiment tracking (metrics, params, artefacts per run)
+- [x] Early stopping with configurable patience
 
-### 🔜 Phase 4 — CI/CD & Production
+### 🔄 Phase 4 — CI/CD & Production *(Current)*
 - [ ] GitHub Actions pipeline (lint → type-check → test → Docker build)
 - [ ] Model registry integration
 - [ ] REST API inference endpoint (FastAPI)
