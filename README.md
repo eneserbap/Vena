@@ -170,9 +170,9 @@ docker run --gpus all -v $(pwd)/data:/app/data vena-train:latest
 - [x] Early stopping with configurable patience
 
 ### 🔄 Phase 4 — CI/CD & Production *(Current)*
-- [ ] GitHub Actions pipeline (lint → type-check → test → Docker build)
+- [x] GitHub Actions pipeline (lint → type-check → test → Docker build)
 - [ ] Model registry integration
-- [ ] REST API inference endpoint (FastAPI)
+- [x] REST API inference endpoint (FastAPI)
 - [ ] Automated DVC data validation checks
 
 ---

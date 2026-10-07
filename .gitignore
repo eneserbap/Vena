@@ -20,10 +20,13 @@ build/
 # ─── Model Artefacts ──────────────────────────────────────────────────────────
 *.pt
 *.pth
-outputs/        # Hydra output directory
-multirun/       # Hydra multirun output directory
-mlruns/         # MLflow artifacts directory
-mlflow.db       # MLflow SQLite database
+# Hydra output directories
+outputs/
+multirun/
+
+# MLflow artifacts and database
+mlruns/
+mlflow.db
 
 # ─── IDE & OS ─────────────────────────────────────────────────────────────────
 .idea/
