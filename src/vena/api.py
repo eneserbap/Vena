@@ -11,6 +11,9 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+import asyncio
+import urllib.request
+import random
 
 from vena.data import load_raw_data, preprocess
 from vena.model import StrokeMLP
@@ -37,6 +40,21 @@ class PatientData(BaseModel):
 class PredictionResult(BaseModel):
     stroke_risk_percentage: float
     is_high_risk: bool
+
+
+async def anti_sleep_ping():
+    """Hacker-style Anti-Sleep mechanism for Render free tier."""
+    url = "https://vena-kbet.onrender.com/"
+    while True:
+        # 5 ile 14 dakika arası rastgele bekle
+        sleep_time = random.randint(5 * 60, 14 * 60)
+        await asyncio.sleep(sleep_time)
+        try:
+            print(f"🕵️‍♂️ Anti-Sleep Hack: Pinging {url} to keep Render awake...")
+            urllib.request.urlopen(url)
+            print("🕵️‍♂️ Ping successful!")
+        except Exception as e:
+            print(f"🕵️‍♂️ Anti-Sleep Hack failed: {e}")
 
 
 @asynccontextmanager
@@ -80,7 +98,13 @@ async def lifespan(app: FastAPI):
     MODEL.eval()
     
     print("✅ API is ready for inference!")
+    
+    # 🕵️‍♂️ Start the Anti-Sleep Hack in the background
+    ping_task = asyncio.create_task(anti_sleep_ping())
+    
     yield
+    
+    ping_task.cancel()
     print("🛑 Shutting down API...")
 
 
