@@ -9,11 +9,12 @@
 .venv/
 
 # Data is mounted at runtime via -v; never bake raw data into the image
-data/
+# (UPDATE for Render: We need data and model outputs baked in because Free tier has no volumes)
+# data/
 
 # Model outputs stay outside the image too
-outputs/
-multirun/
+# outputs/
+# multirun/
 
 # Python bytecode
 __pycache__/
