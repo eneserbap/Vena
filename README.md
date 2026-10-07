@@ -169,11 +169,16 @@ docker run --gpus all -v $(pwd)/data:/app/data vena-train:latest
 - [x] MLflow experiment tracking (metrics, params, artefacts per run)
 - [x] Early stopping with configurable patience
 
-### 🔄 Phase 4 — CI/CD & Production *(Current)*
-- [x] GitHub Actions pipeline (lint → type-check → test → Docker build)
-- [ ] Model registry integration
+### 🔄 Phase 4 — CI/CD & Deployment *(Current)*
 - [x] REST API inference endpoint (FastAPI)
-- [ ] Automated DVC data validation checks
+- [x] Docker containerization for the Backend API
+- [x] GitHub Actions pipeline (Automated lint, type-check, and test)
+- [ ] Cloud Deployment strategy (Hugging Face Spaces / Render)
+
+### 🔮 Phase 5 — Monitoring & Reliability (Future Scope)
+- [ ] Data & Concept Drift detection with Evidently
+- [ ] System health monitoring with Prometheus
+- [ ] Automated retrain pipelines on data drift
 
 ---
 

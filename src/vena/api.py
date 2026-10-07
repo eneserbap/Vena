@@ -22,16 +22,16 @@ TRAINING_COLUMNS = None
 
 
 class PatientData(BaseModel):
-    gender: str = Field(..., example="Male")
-    age: float = Field(..., example=67.0)
-    hypertension: int = Field(..., example=0)
-    heart_disease: int = Field(..., example=1)
-    ever_married: str = Field(..., example="Yes")
-    work_type: str = Field(..., example="Private")
-    Residence_type: str = Field(..., example="Urban")
-    avg_glucose_level: float = Field(..., example=228.69)
-    bmi: float = Field(..., example=36.6)
-    smoking_status: str = Field(..., example="formerly smoked")
+    gender: str = Field(..., pattern="^(Male|Female|Other)$", example="Male")
+    age: float = Field(..., ge=0, le=120, description="Yaş (0-120 arası olmalı)", example=67.0)
+    hypertension: int = Field(..., ge=0, le=1, description="Hipertansiyon: Yok (0) veya Var (1)", example=0)
+    heart_disease: int = Field(..., ge=0, le=1, description="Kalp Hastalığı: Yok (0) veya Var (1)", example=1)
+    ever_married: str = Field(..., pattern="^(Yes|No)$", example="Yes")
+    work_type: str = Field(..., pattern="^(Private|Self-employed|children|Govt_job|Never_worked)$", example="Private")
+    Residence_type: str = Field(..., pattern="^(Urban|Rural)$", example="Urban")
+    avg_glucose_level: float = Field(..., ge=30, le=400, description="Glikoz Seviyesi (30-400 mg/dL)", example=228.69)
+    bmi: float = Field(..., ge=10, le=80, description="Vücut Kitle İndeksi (10-80 arası)", example=36.6)
+    smoking_status: str = Field(..., pattern="^(formerly smoked|never smoked|smokes|Unknown)$", example="formerly smoked")
 
 
 class PredictionResult(BaseModel):
