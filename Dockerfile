@@ -12,11 +12,12 @@ WORKDIR /app
 # Copy only the dependency files first (Leveraging Docker cache)
 COPY pyproject.toml uv.lock ./
 
+# Copy the rest of the application code (src) BEFORE installing
+# so that `uv` can find `src/vena/__init__.py` to build the package.
+COPY . .
+
 # Install dependencies system-wide (since we are isolated in a container anyway)
 RUN uv pip install --system --no-cache -e .
-
-# Copy the rest of the application code, model checkpoints, and data
-COPY . .
 
 # Expose the port that FastAPI will run on
 EXPOSE 8000
