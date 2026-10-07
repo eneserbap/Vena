@@ -31,4 +31,3 @@ tests/
 
 # Dev environment files
 .env
-*.md
