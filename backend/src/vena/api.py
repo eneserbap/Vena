@@ -114,6 +114,10 @@ async def lifespan(app: FastAPI):
 
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import Request
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 app = FastAPI(
     title="VENA PROJECT API",
@@ -125,6 +129,11 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Set up Rate Limiting
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -134,7 +143,7 @@ app.add_middleware(
 )
 
 @app.get("/docs", include_in_schema=False)
-async def custom_api_docs():
+async def custom_api_docs() -> HTMLResponse:
     """Returns a beautiful custom API documentation using Scalar."""
     html_content = """
     <!DOCTYPE html>
@@ -163,12 +172,13 @@ async def custom_api_docs():
 
 
 @app.get("/")
-def health_check():
+def health_check() -> dict[str, str]:
     return {"status": "healthy", "model": "StrokeMLP"}
 
 
 @app.post("/predict", response_model=PredictionResult)
-def predict(patient: PatientData):
+@limiter.limit("10/minute")
+def predict(request: Request, patient: PatientData) -> PredictionResult:
     """Predict the stroke risk for a given patient."""
     if MODEL is None or SCALER is None or TRAINING_COLUMNS is None:
         raise HTTPException(status_code=503, detail="Model is not loaded.")
