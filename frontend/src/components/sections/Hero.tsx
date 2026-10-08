@@ -8,24 +8,28 @@ export default function Hero() {
   return (
     <section className="relative min-h-screen bg-gradient-to-b from-[#637d95] to-[#4a637a] pt-32 pb-20 px-12 overflow-hidden flex flex-col items-center">
       
-      {/* Massive Background Text */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none z-0">
-        <h1 className="absolute right-[52%] top-1/2 -translate-y-1/2 text-[9rem] xl:text-[11rem] font-light text-white/90 tracking-tighter">VENA</h1>
-        <h1 className="absolute left-[52%] top-1/2 -translate-y-1/2 text-[9rem] xl:text-[11rem] font-light text-white/90 tracking-tighter">PROJECT</h1>
-      </div>
-
       {/* Grid Pattern Overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:60px_60px] pointer-events-none z-0"></div>
 
-      {/* 3D Heart Image (Replacing the DNA) */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] flex justify-center items-center pointer-events-none mix-blend-screen z-0">
+      {/* 3D Heart Image (Background) */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] flex justify-center items-center pointer-events-none mix-blend-screen z-0 opacity-50">
         <motion.img 
           src="/heart.jpg" 
           alt="3D Heart"
-          className="w-[600px] h-[600px] object-cover opacity-90 brightness-110"
+          className="w-full h-full object-cover brightness-110"
           animate={{ y: [0, -20, 0], scale: [1, 1.02, 1] }}
           transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
         />
+      </div>
+
+      {/* Massive Foreground Text */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[60%] w-full flex flex-col items-center justify-center pointer-events-none z-10">
+        <h1 className="text-[10rem] xl:text-[14rem] font-bold text-rose-500 tracking-tighter leading-none drop-shadow-[0_0_40px_rgba(244,63,94,0.4)]">
+          VENA
+        </h1>
+        <h1 className="text-[4rem] xl:text-[5rem] font-light text-white tracking-[0.4em] leading-none mt-2">
+          PROJECT
+        </h1>
       </div>
 
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-[280px] z-30">
