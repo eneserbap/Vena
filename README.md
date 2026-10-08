@@ -1,14 +1,15 @@
 <div align="center">
 
-![Vena Banner](banner.png)
-<br/>
-
-<img src="https://img.shields.io/badge/Status-Phase%201%20%E2%80%94%20Scaffolding-blue?style=for-the-badge" />
+<img src="https://img.shields.io/badge/Status-Phase%205%20%E2%80%94%20Full%20Stack-blue?style=for-the-badge" />
 <img src="https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white" />
 <img src="https://img.shields.io/badge/PyTorch-2.x-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white" />
 <img src="https://img.shields.io/badge/Hydra-1.3-89B4FA?style=for-the-badge" />
 <img src="https://img.shields.io/badge/DVC-3.x-945DD6?style=for-the-badge&logo=dvc&logoColor=white" />
 <img src="https://img.shields.io/badge/uv-Package%20Manager-DE5FE9?style=for-the-badge" />
+
+<br/><br/>
+
+![Vena Banner](banner.png)
 
 <br/><br/>
 
