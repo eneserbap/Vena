@@ -1,14 +1,10 @@
 "use client";
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 
 export default function ApiDocs() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [150, -150]);
-
   return (
-    <section ref={ref} className="py-24 px-10 bg-[#0a0a0b] flex justify-center overflow-hidden">
+    <section className="py-24 px-10 bg-[#0a0a0b] flex justify-center overflow-hidden">
       <div className="max-w-6xl w-full flex flex-col items-center">
         
         <motion.div 
@@ -27,7 +23,6 @@ export default function ApiDocs() {
         </motion.div>
 
         <motion.div 
-          style={{ y }}
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}

@@ -1,18 +1,11 @@
 "use client";
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { Settings, Box } from 'lucide-react';
 
 export default function About() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"]
-  });
-  const visualY = useTransform(scrollYProgress, [0, 1], [140, -140]);
-
   return (
-    <section id="about" ref={ref} className="py-24 px-10 bg-[#fbfaf8] flex justify-center overflow-hidden">
+    <section id="about" className="py-24 px-10 bg-[#fbfaf8] flex justify-center overflow-hidden">
       <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         
         {/* Text Side */}
@@ -59,7 +52,6 @@ export default function About() {
 
         {/* Visual/Graphic Side */}
         <motion.div 
-          style={{ y: visualY }}
           initial={{ opacity: 0, x: 50 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -97,14 +89,21 @@ export default function About() {
                  <span className="text-[#d0ff5a] text-xs font-mono">{item.time}</span>
                </motion.div>
              ))}
-          </div>
 
-          <div className="relative z-10 bg-black/40 backdrop-blur-xl rounded-xl p-4 flex items-center justify-between border border-white/5">
-             <div className="flex items-center gap-3">
-               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-               <span className="text-white text-sm font-medium">Model Checkpoint Saved</span>
-             </div>
-             <span className="text-white/50 text-xs font-mono">Status: OK</span>
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 1.1 }}
+              className="relative z-10 bg-black/40 backdrop-blur-xl rounded-xl p-4 flex items-center justify-between border border-white/5"
+            >
+               <div className="flex items-center gap-3">
+                 <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                 <span className="text-white text-sm font-medium">Model Checkpoint Saved</span>
+               </div>
+               <span className="text-white/50 text-xs font-mono">Status: OK</span>
+            </motion.div>
+
           </div>
 
         </motion.div>
