@@ -1,11 +1,18 @@
 "use client";
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Settings, Box } from 'lucide-react';
 
 export default function About() {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  });
+  const visualY = useTransform(scrollYProgress, [0, 1], [140, -140]);
+
   return (
-    <section className="py-32 px-10 bg-[#fbfaf8] flex justify-center overflow-hidden">
+    <section id="about" ref={ref} className="py-24 px-10 bg-[#fbfaf8] flex justify-center overflow-hidden">
       <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         
         {/* Text Side */}
@@ -15,9 +22,7 @@ export default function About() {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8 }}
         >
-          <div className="bg-[#2c3e50] text-[#86bfa3] px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase mb-6 inline-block">
-            [ MLOps Architecture ]
-          </div>
+
           
           <h2 className="text-4xl md:text-5xl font-medium text-[#1c2833] mb-6 leading-tight">
             Built for Production, Not Just Notebooks
@@ -54,6 +59,7 @@ export default function About() {
 
         {/* Visual/Graphic Side */}
         <motion.div 
+          style={{ y: visualY }}
           initial={{ opacity: 0, x: 50 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "-100px" }}

@@ -1,21 +1,19 @@
 "use client";
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 
 export default function Process() {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const y1 = useTransform(scrollYProgress, [0, 1], [90, -90]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [-40, 40]);
+  const y3 = useTransform(scrollYProgress, [0, 1], [120, -120]);
+
   return (
-    <section className="py-32 px-10 bg-gradient-to-b from-[#5c778e] to-[#455f75] flex flex-col items-center text-white">
+    <section id="process" ref={ref} className="py-24 px-10 bg-gradient-to-b from-[#5c778e] to-[#455f75] flex flex-col items-center text-white">
       
       {/* Top Badge */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        className="bg-white/10 text-white border border-white/20 px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase mb-6"
-      >
-        [ Global Health Crisis ]
-      </motion.div>
+
 
       <motion.h2 
         initial={{ opacity: 0, y: 30 }}
@@ -31,6 +29,7 @@ export default function Process() {
         
         {/* Card 1 */}
         <motion.div 
+          style={{ y: y1 }}
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -51,6 +50,7 @@ export default function Process() {
 
         {/* Card 2 */}
         <motion.div 
+          style={{ y: y2 }}
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -71,6 +71,7 @@ export default function Process() {
 
         {/* Card 3 */}
         <motion.div 
+          style={{ y: y3 }}
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

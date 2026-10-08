@@ -11,8 +11,6 @@ export default function Assessment() {
     age: 45,
     hypertension: 0,
     heart_disease: 0,
-    ever_married: 'Yes',
-    work_type: 'Private',
     Residence_type: 'Urban',
     avg_glucose_level: 105.5,
     bmi: 28.0,
@@ -34,7 +32,8 @@ export default function Assessment() {
     setLoading(true);
     
     try {
-      const response = await fetch('https://vena-kbet.onrender.com/predict', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -53,7 +52,7 @@ export default function Assessment() {
   };
 
   return (
-    <section id="assessment" className="min-h-screen bg-[#F8F9FA] py-32 px-10 relative overflow-hidden flex justify-center items-center">
+    <section id="assessment" className="min-h-screen bg-[#F8F9FA] py-24 px-10 relative overflow-hidden flex justify-center items-center">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-gradient-to-bl from-purple-200/50 to-blue-200/50 blur-[120px] pointer-events-none -z-10"></div>
       
       <div className="max-w-4xl w-full">
@@ -64,7 +63,6 @@ export default function Assessment() {
           transition={{ duration: 1 }}
           className="text-center mb-16"
         >
-          <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400 mb-4 block">Vena Model Check-Up</span>
           <h2 className="text-5xl font-medium text-gray-900 mb-6">Your Source for Knowledge and Insights</h2>
           <p className="text-lg text-gray-500 max-w-2xl mx-auto">Enter your clinical parameters to receive an instant, AI-driven assessment of your stroke risk profile.</p>
         </motion.div>
@@ -142,13 +140,15 @@ export default function Assessment() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Work Type</label>
-                  <select name="work_type" value={formData.work_type} onChange={handleInputChange} 
-                    className="w-full bg-gray-50 border-none rounded-2xl px-5 py-4 text-gray-900 outline-none focus:ring-2 focus:ring-purple-200 transition-all appearance-none font-medium text-lg cursor-pointer">
-                    <option value="Private">Private Sector</option>
-                    <option value="Self-employed">Self-employed</option>
-                    <option value="Govt_job">Government Job</option>
-                  </select>
+                  <label className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Residence Type</label>
+                  <div className="flex bg-gray-50 rounded-2xl p-1.5">
+                    {['Rural', 'Urban'].map(val => (
+                      <button key={val} type="button" onClick={() => setFormData({...formData, Residence_type: val})}
+                        className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${formData.Residence_type === val ? 'bg-white shadow-md text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}>
+                        {val}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 

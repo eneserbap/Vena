@@ -25,16 +25,14 @@ TRAINING_COLUMNS = None
 
 
 class PatientData(BaseModel):
-    gender: str = Field(..., pattern="^(Male|Female|Other)$", example="Male")
-    age: float = Field(..., ge=0, le=120, description="Yaş (0-120 arası olmalı)", example=67.0)
-    hypertension: int = Field(..., ge=0, le=1, description="Hipertansiyon: Yok (0) veya Var (1)", example=0)
-    heart_disease: int = Field(..., ge=0, le=1, description="Kalp Hastalığı: Yok (0) veya Var (1)", example=1)
-    ever_married: str = Field(..., pattern="^(Yes|No)$", example="Yes")
-    work_type: str = Field(..., pattern="^(Private|Self-employed|children|Govt_job|Never_worked)$", example="Private")
-    Residence_type: str = Field(..., pattern="^(Urban|Rural)$", example="Urban")
-    avg_glucose_level: float = Field(..., ge=30, le=400, description="Glikoz Seviyesi (30-400 mg/dL)", example=228.69)
-    bmi: float = Field(..., ge=10, le=80, description="Vücut Kitle İndeksi (10-80 arası)", example=36.6)
-    smoking_status: str = Field(..., pattern="^(formerly smoked|never smoked|smokes|Unknown)$", example="formerly smoked")
+    gender: str = Field(..., pattern="^(Male|Female|Other)$", examples=["Male"])
+    age: float = Field(..., ge=0, le=120, description="Yaş (0-120 arası olmalı)", examples=[67.0])
+    hypertension: int = Field(..., ge=0, le=1, description="Hipertansiyon: Yok (0) veya Var (1)", examples=[0])
+    heart_disease: int = Field(..., ge=0, le=1, description="Kalp Hastalığı: Yok (0) veya Var (1)", examples=[1])
+    Residence_type: str = Field(..., pattern="^(Urban|Rural)$", examples=["Urban"])
+    avg_glucose_level: float = Field(..., ge=30, le=400, description="Glikoz Seviyesi (30-400 mg/dL)", examples=[228.69])
+    bmi: float = Field(..., ge=10, le=80, description="Vücut Kitle İndeksi (10-80 arası)", examples=[36.6])
+    smoking_status: str = Field(..., pattern="^(formerly smoked|never smoked|smokes|Unknown)$", examples=["formerly smoked"])
 
 
 class PredictionResult(BaseModel):
@@ -114,12 +112,54 @@ async def lifespan(app: FastAPI):
     print("🛑 Shutting down API...")
 
 
+from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(
-    title="Vena Stroke Prediction API",
-    description="Real-time inference endpoint for StrokeMLP.",
-    version="1.0.0",
+    title="VENA PROJECT API",
+    summary="A production-grade Deep Learning inference API for Stroke Risk Prediction.",
+    description="Welcome to the VENA REST API. This service provides real-time inference using a PyTorch MLP trained on tabular clinical records.",
+    version="2.0.0",
+    docs_url=None, # Disable default swagger
+    redoc_url=None, # Disable default redoc
     lifespan=lifespan,
 )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/docs", include_in_schema=False)
+async def custom_api_docs():
+    """Returns a beautiful custom API documentation using Scalar."""
+    html_content = """
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>VENA PROJECT API Docs</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <style>
+          body { margin: 0; padding: 0; background-color: #0f0f11; }
+        </style>
+      </head>
+      <body>
+        <!-- Scalar API Reference -->
+        <script 
+            id="api-reference" 
+            data-url="/openapi.json"
+            data-theme="moon"
+            data-hide-models="false"
+        ></script>
+        <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+      </body>
+    </html>
+    """
+    return HTMLResponse(content=html_content)
 
 
 @app.get("/")
@@ -133,8 +173,13 @@ def predict(patient: PatientData):
     if MODEL is None or SCALER is None or TRAINING_COLUMNS is None:
         raise HTTPException(status_code=503, detail="Model is not loaded.")
         
+    patient_dict = patient.model_dump()
+    # Add omitted fields back so the pipeline can process them correctly without crashing
+    patient_dict["ever_married"] = "Yes"
+    patient_dict["work_type"] = "Private"
+    
     # 1. Convert input to DataFrame
-    df = pd.DataFrame([patient.model_dump()])
+    df = pd.DataFrame([patient_dict])
     
     # 2. Preprocess exactly as in data.py
     df["ever_married"] = df["ever_married"].map({"Yes": 1, "No": 0})

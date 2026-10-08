@@ -1,21 +1,24 @@
 "use client";
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 
 export default function Services() {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  });
+  
+  const y1 = useTransform(scrollYProgress, [0, 1], [100, -100]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [-40, 40]);
+  const y3 = useTransform(scrollYProgress, [0, 1], [-100, 100]);
+  const y4 = useTransform(scrollYProgress, [0, 1], [160, -160]);
+
   return (
-    <section className="py-32 bg-[#fbfaf8] flex flex-col items-center px-10">
+    <section id="services" ref={ref} className="py-24 bg-[#fbfaf8] flex flex-col items-center px-10">
       
       {/* Top Badge */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        className="bg-slate-900 text-[#d0ff5a] px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase mb-6"
-      >
-        [ Core Capabilities ]
-      </motion.div>
+
 
       <motion.h2 
         initial={{ opacity: 0, y: 30 }}
@@ -32,6 +35,7 @@ export default function Services() {
         
         {/* Column 1: Tall Card */}
         <motion.div 
+          style={{ y: y1 }}
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -49,6 +53,7 @@ export default function Services() {
         {/* Column 2: Two Stacked Cards */}
         <div className="col-span-1 h-full flex flex-col gap-4">
           <motion.div 
+            style={{ y: y2 }}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -76,6 +81,7 @@ export default function Services() {
 
         {/* Column 3: Tall Card */}
         <motion.div 
+          style={{ y: y3 }}
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -92,6 +98,7 @@ export default function Services() {
 
         {/* Column 4: Tall Card */}
         <motion.div 
+          style={{ y: y4 }}
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
