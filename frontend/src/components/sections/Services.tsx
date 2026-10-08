@@ -38,7 +38,7 @@ export default function Services() {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="col-span-1 h-full rounded-[2rem] relative overflow-hidden bg-[#516b84] shadow-lg group"
         >
-          <img src="https://images.unsplash.com/photo-1559757175-5700dde675bc?q=80&w=800&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-multiply group-hover:scale-105 transition-transform duration-700" alt="Brain Scan" />
+          <img src="https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?q=80&w=800&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-multiply group-hover:scale-105 transition-transform duration-700" alt="Tech Architecture" />
           <div className="absolute bottom-4 left-4 right-4 bg-white rounded-[1.5rem] p-6 text-center shadow-xl">
              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Architecture</span>
              <h3 className="text-5xl font-light text-gray-900 mb-2">100<span className="text-2xl">%</span></h3>
@@ -98,7 +98,7 @@ export default function Services() {
           transition={{ duration: 0.6, delay: 0.5 }}
           className="col-span-1 h-full rounded-[2rem] relative overflow-hidden bg-slate-800 shadow-lg group"
         >
-          <img src="https://images.unsplash.com/photo-1532187863486-abf9db8270b1?q=80&w=800&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-multiply group-hover:scale-105 transition-transform duration-700" alt="Laboratory" />
+          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-multiply group-hover:scale-105 transition-transform duration-700" alt="Code Data" />
           <div className="absolute bottom-4 left-4 right-4 bg-white rounded-[1.5rem] p-6 text-center shadow-xl">
              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-2">Open Source</span>
              <h3 className="text-5xl font-light text-gray-900 mb-2">100<span className="text-2xl">%</span></h3>
