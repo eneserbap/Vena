@@ -243,25 +243,25 @@ def predict(request: Request, patient: PatientData) -> PredictionResult:
         feature_impacts = list(zip(TRAINING_COLUMNS, contributions))
         feature_impacts.sort(key=lambda x: abs(x[1]), reverse=True)
         
-        report = "Klinik Analiz Raporu: "
+        report = "Clinical Analysis Report: "
         if is_high_risk:
-            report += f"Sistemimiz hastada %{risk_percentage:.1f} oranında inme riski tespit etmiştir. "
+            report += f"The system has detected a significantly elevated stroke risk of {risk_percentage:.1f}%. "
         else:
-            report += f"Hastanın inme riski (%{risk_percentage:.1f}) düşük seviyededir. "
+            report += f"The patient's stroke risk is currently at a low level ({risk_percentage:.1f}%). "
             
         top_positives = [f for f in feature_impacts if f[1] > 0][:2]
         top_negatives = [f for f in feature_impacts if f[1] < 0][:2]
         
         if top_positives:
             factors = ", ".join([f[0].replace("_", " ").title() for f in top_positives])
-            report += f"Bu riski en çok artıran faktörler sırasıyla: {factors}. "
+            report += f"The primary factors increasing this risk are: {factors}. "
         if top_negatives:
             factors = ", ".join([f[0].replace("_", " ").title() for f in top_negatives])
-            report += f"Riski düşüren (koruyucu) faktörler: {factors}. "
+            report += f"The protective factors reducing this risk are: {factors}. "
             
-        report += "Bu analiz SHAP (Explainable AI) algoritmaları ile üretilmiştir."
+        report += "This mathematical analysis is generated using SHAP (Explainable AI)."
     except Exception as e:
-        report = "Açıklanabilir Yapay Zeka (SHAP) raporu şu anda oluşturulamadı."
+        report = "The Explainable AI (SHAP) report could not be generated at this time."
         print(f"SHAP Error: {e}")
     
     return PredictionResult(
