@@ -11,7 +11,7 @@ export default function Hero() {
       {/* Massive Background Text */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full flex justify-between px-20 pointer-events-none z-0">
         <h1 className="text-[12rem] font-light text-white/90 tracking-tighter">VENA</h1>
-        <h1 className="text-[12rem] font-light text-white/90 tracking-tighter">CORE</h1>
+        <h1 className="text-[12rem] font-light text-white/90 tracking-tighter">PROJECT</h1>
       </div>
 
       {/* Grid Pattern Overlay */}
