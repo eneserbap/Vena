@@ -57,7 +57,8 @@ export default function Assessment() {
   };
 
   return (
-    <section id="assessment" className="min-h-screen bg-[#F8F9FA] py-24 px-10 relative flex justify-center items-center">
+    <>
+      <section id="assessment" className="min-h-screen bg-[#F8F9FA] py-24 px-10 relative flex justify-center items-center print:hidden">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-gradient-to-bl from-purple-200/50 to-blue-200/50 blur-[120px] pointer-events-none -z-10"></div>
       
       <div className="max-w-4xl w-full relative z-10">
@@ -216,10 +217,16 @@ export default function Assessment() {
                   Start New Check-Up
                 </button>
               </div>
+            </div>
+          )}
+        </motion.div>
+      </div>
+    </section>
 
-              {/* Hidden A4 Template for PDF Generation */}
-              <div className="hidden print:block print-section w-[794px] min-h-[1123px] bg-white p-16 text-black font-sans text-left">
-                  {/* Header */}
+    {/* Hidden A4 Template for PDF Generation */}
+    {result && (
+      <div className="hidden print:block w-[794px] min-h-[1123px] bg-white p-16 text-black font-sans text-left mx-auto">
+        {/* Header */}
                   <div className="flex justify-between items-center border-b-4 border-black pb-8 mb-10">
                     <div>
                       <h1 className="text-5xl font-black tracking-tighter mb-2">VENA<span className="text-gray-400">ML</span></h1>
@@ -297,11 +304,8 @@ export default function Assessment() {
                       Not a substitute for professional medical diagnosis.
                     </div>
                   </div>
-                </div>
-            </div>
-          )}
-        </motion.div>
       </div>
-    </section>
+    )}
+    </>
   );
 }
