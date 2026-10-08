@@ -5,7 +5,7 @@ import { Activity, Heart, ActivitySquare, ArrowRight, Loader2, CheckCircle2 } fr
 
 export default function Assessment() {
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<{ stroke_risk_percentage: number; is_high_risk: boolean } | null>(null);
+  const [result, setResult] = useState<{ stroke_risk_percentage: number; is_high_risk: boolean; doctors_report?: string } | null>(null);
   const [formData, setFormData] = useState({
     gender: 'Female',
     age: 45,
@@ -184,6 +184,18 @@ export default function Assessment() {
                   style={{ width: `${result.stroke_risk_percentage}%` }}
                 ></div>
               </div>
+              
+              {result.doctors_report && (
+                <div className="mt-8 p-6 bg-white border border-gray-100 shadow-sm rounded-2xl text-left relative overflow-hidden group">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-[#d0ff5a]"></div>
+                  <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-[#d0ff5a]" /> AI Clinical Report
+                  </h4>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {result.doctors_report}
+                  </p>
+                </div>
+              )}
               
               <div className="mt-12">
                 <button 

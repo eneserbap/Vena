@@ -38,6 +38,10 @@ class PatientData(BaseModel):
 class PredictionResult(BaseModel):
     stroke_risk_percentage: float
     is_high_risk: bool
+    doctors_report: str
+    
+import shap
+EXPLAINER = None
 
 
 async def anti_sleep_ping():
@@ -101,7 +105,15 @@ async def lifespan(app: FastAPI):
     MODEL.load_state_dict(checkpoint["model_state_dict"])
     MODEL.eval()
     
-    print("✅ API is ready for inference!")
+    # Initialize SHAP Explainer
+    global EXPLAINER
+    # Select 100 random samples as background for SHAP to baseline against
+    background_df = X_train.sample(n=min(100, len(X_train)), random_state=42)
+    background_scaled = SCALER.transform(background_df)
+    background_tensor = torch.tensor(background_scaled, dtype=torch.float32)
+    EXPLAINER = shap.DeepExplainer(MODEL, background_tensor)
+    
+    print("✅ API is ready for inference with SHAP Explainability!")
     
     # 🕵️‍♂️ Start the Anti-Sleep Hack in the background
     ping_task = asyncio.create_task(anti_sleep_ping())
@@ -216,11 +228,44 @@ def predict(request: Request, patient: PatientData) -> PredictionResult:
         prob = torch.sigmoid(logits).item()
         
     risk_percentage = prob * 100
-    # A 15% threshold is often used for imbalanced datasets, but 50% is standard.
-    # We'll use 50% for standard classification logic.
     is_high_risk = prob > 0.5 
+    
+    # 6. SHAP Explainability (Doctor's Report)
+    try:
+        # Get SHAP values for the single input tensor
+        shap_values = EXPLAINER.shap_values(X_tensor)
+        # DeepExplainer returns a list of arrays for PyTorch, or single array
+        if isinstance(shap_values, list):
+            contributions = shap_values[0][0]
+        else:
+            contributions = shap_values[0]
+            
+        feature_impacts = list(zip(TRAINING_COLUMNS, contributions))
+        feature_impacts.sort(key=lambda x: abs(x[1]), reverse=True)
+        
+        report = "Klinik Analiz Raporu: "
+        if is_high_risk:
+            report += f"Sistemimiz hastada %{risk_percentage:.1f} oranında inme riski tespit etmiştir. "
+        else:
+            report += f"Hastanın inme riski (%{risk_percentage:.1f}) düşük seviyededir. "
+            
+        top_positives = [f for f in feature_impacts if f[1] > 0][:2]
+        top_negatives = [f for f in feature_impacts if f[1] < 0][:2]
+        
+        if top_positives:
+            factors = ", ".join([f[0].replace("_", " ").title() for f in top_positives])
+            report += f"Bu riski en çok artıran faktörler sırasıyla: {factors}. "
+        if top_negatives:
+            factors = ", ".join([f[0].replace("_", " ").title() for f in top_negatives])
+            report += f"Riski düşüren (koruyucu) faktörler: {factors}. "
+            
+        report += "Bu analiz SHAP (Explainable AI) algoritmaları ile üretilmiştir."
+    except Exception as e:
+        report = "Açıklanabilir Yapay Zeka (SHAP) raporu şu anda oluşturulamadı."
+        print(f"SHAP Error: {e}")
     
     return PredictionResult(
         stroke_risk_percentage=round(risk_percentage, 2),
-        is_high_risk=is_high_risk
+        is_high_risk=is_high_risk,
+        doctors_report=report
     )
