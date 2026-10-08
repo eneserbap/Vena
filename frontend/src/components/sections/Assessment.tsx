@@ -1,8 +1,8 @@
 "use client";
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Activity, Heart, ActivitySquare, ArrowRight, Loader2, CheckCircle2, Download } from 'lucide-react';
-import generatePDF from 'react-to-pdf';
+import { usePDF } from 'react-to-pdf';
 
 export default function Assessment() {
   const [loading, setLoading] = useState(false);
@@ -18,14 +18,10 @@ export default function Assessment() {
     smoking_status: 'never smoked'
   });
   
-  const targetRef = useRef<HTMLDivElement>(null);
-
-  const handleDownloadPDF = () => {
-    generatePDF(targetRef, {
-      filename: `Vena_Clinical_Report_${Date.now()}.pdf`,
-      page: { format: 'A4' }
-    });
-  };
+  const { toPDF, targetRef } = usePDF({
+    filename: `Vena_Clinical_Report.pdf`,
+    page: { format: 'A4' }
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -63,10 +59,10 @@ export default function Assessment() {
   };
 
   return (
-    <section id="assessment" className="min-h-screen bg-[#F8F9FA] py-24 px-10 relative overflow-hidden flex justify-center items-center">
+    <section id="assessment" className="min-h-screen bg-[#F8F9FA] py-24 px-10 relative flex justify-center items-center">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-gradient-to-bl from-purple-200/50 to-blue-200/50 blur-[120px] pointer-events-none -z-10"></div>
       
-      <div className="max-w-4xl w-full">
+      <div className="max-w-4xl w-full relative z-10">
         <motion.div 
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -83,7 +79,7 @@ export default function Assessment() {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 1, delay: 0.2 }}
-          className="bg-white/80 backdrop-blur-2xl border border-white shadow-[0_20px_60px_rgb(0,0,0,0.05)] rounded-[3rem] p-12 relative overflow-hidden"
+          className="bg-white/80 backdrop-blur-2xl border border-white shadow-[0_20px_60px_rgb(0,0,0,0.05)] rounded-[3rem] p-12 relative"
         >
           {!result ? (
             <form onSubmit={handleSubmit} className="relative z-10">
@@ -167,7 +163,7 @@ export default function Assessment() {
                 <button 
                   type="submit" 
                   disabled={loading}
-                  className="group relative flex items-center justify-center gap-3 bg-black text-white px-12 py-5 rounded-full font-semibold text-lg transition-all shadow-xl hover:-translate-y-1 disabled:opacity-70 disabled:transform-none"
+                  className="group relative flex items-center justify-center gap-3 bg-black text-white px-12 py-5 rounded-full font-semibold text-lg transition-all shadow-xl hover:bg-gray-800 disabled:opacity-70"
                 >
                   {loading ? (
                     <><Loader2 className="w-6 h-6 animate-spin text-purple-400" /> Analyzing...</>
@@ -209,22 +205,22 @@ export default function Assessment() {
               
               <div className="mt-12 flex flex-col md:flex-row justify-center items-center gap-4">
                 <button 
-                  onClick={handleDownloadPDF}
-                  className="px-10 py-4 rounded-full font-semibold text-white bg-black transition-colors shadow-lg hover:shadow-xl hover:-translate-y-1 flex items-center gap-2 w-full md:w-auto justify-center"
+                  onClick={() => toPDF()}
+                  className="px-10 py-4 rounded-full font-semibold text-white bg-black transition-colors shadow-sm hover:bg-gray-800 flex items-center gap-2 w-full md:w-auto justify-center"
                 >
                   <Download className="w-5 h-5" />
                   Download Official Report
                 </button>
                 <button 
                   onClick={() => setResult(null)}
-                  className="px-10 py-4 rounded-full font-semibold text-gray-600 bg-white border border-gray-200 transition-colors shadow-sm hover:shadow w-full md:w-auto justify-center"
+                  className="px-10 py-4 rounded-full font-semibold text-gray-600 bg-white border border-gray-200 transition-colors shadow-sm hover:bg-gray-50 w-full md:w-auto justify-center"
                 >
                   Start New Check-Up
                 </button>
               </div>
 
               {/* Hidden A4 Template for PDF Generation */}
-              <div className="absolute left-[-9999px] top-0 pointer-events-none">
+              <div className="absolute top-0 left-0 w-full opacity-0 pointer-events-none -z-50">
                 <div ref={targetRef} className="w-[794px] min-h-[1123px] bg-white p-16 text-black font-sans text-left">
                   {/* Header */}
                   <div className="flex justify-between items-center border-b-4 border-black pb-8 mb-10">
