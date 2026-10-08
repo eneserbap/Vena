@@ -1,62 +1,88 @@
 "use client";
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowDown } from 'lucide-react';
-
 import DNA from '@/components/ui/DNA';
+import { Globe, ArrowUpRight } from 'lucide-react';
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center px-10 pt-20 overflow-hidden bg-white">
-      {/* 3D WebGL Point Cloud DNA */}
-      <DNA />
-
-      <div className="relative z-10 max-w-3xl">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.2 }}
-        >
-          <span className="text-xs font-bold uppercase tracking-[0.2em] text-gray-400 mb-8 block">
-            Purpose of Vena
-          </span>
-          <h1 className="text-[5rem] leading-[1.05] font-medium tracking-tight text-gray-900 mb-8">
-            Detailed diagnostic <br /> of your risk
-          </h1>
-          <p className="text-xl text-gray-500 max-w-md font-light leading-relaxed mb-12">
-            Health is the most important thing. So don't put it off for later. Think about your future today.
-          </p>
-          
-          <div className="flex items-center gap-8">
-            <button className="px-8 py-4 rounded-full border border-gray-300 text-sm font-semibold uppercase tracking-wider hover:bg-gray-900 hover:text-white transition-all duration-300">
-              Run Assessment
-            </button>
-            <button className="flex items-center gap-3 px-6 py-4 rounded-full bg-gray-900 text-white text-sm font-semibold hover:bg-black transition-all group">
-              <ArrowDown className="w-4 h-4 group-hover:translate-y-1 transition-transform" />
-              Scroll for more
-            </button>
-          </div>
-        </motion.div>
+    <section className="relative min-h-screen bg-gradient-to-b from-[#637d95] to-[#4a637a] pt-32 pb-20 px-12 overflow-hidden flex flex-col items-center">
+      
+      {/* Massive Background Text */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full flex justify-between px-20 pointer-events-none z-0">
+        <h1 className="text-[12rem] font-light text-white/90 tracking-tighter">VENA</h1>
+        <h1 className="text-[12rem] font-light text-white/90 tracking-tighter">CORE</h1>
       </div>
 
-      {/* Floating Info Card at Bottom */}
-      <motion.div 
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 0.5 }}
-        className="absolute bottom-10 left-10 right-10 bg-white/80 backdrop-blur-xl border border-gray-100 rounded-[2rem] p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-10 shadow-[0_20px_40px_rgb(0,0,0,0.04)]"
-      >
-        <div className="flex items-baseline gap-6">
-          <span className="text-6xl font-medium text-gray-900">01</span>
-          <div>
-            <span className="text-xs font-bold text-gray-400 tracking-wider mb-1 block">2026-10-08</span>
-            <h3 className="text-xl font-medium text-gray-900 max-w-[200px] leading-snug">First AI Model in Clinical Research</h3>
+      {/* Grid Pattern Overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:60px_60px] pointer-events-none z-0"></div>
+
+      {/* 3D Heart Image (Replacing the DNA) */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] flex justify-center items-center pointer-events-none mix-blend-screen z-0">
+        <motion.img 
+          src="/heart.jpg" 
+          alt="3D Heart"
+          className="w-[600px] h-[600px] object-cover opacity-90 brightness-110"
+          animate={{ y: [0, -20, 0], scale: [1, 1.02, 1] }}
+          transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+        />
+      </div>
+
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-[280px] z-30">
+         <motion.a 
+           href="#assessment"
+           initial={{ opacity: 0, y: 20 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ delay: 1 }}
+           className="bg-[#d0ff5a] text-[#2c3e50] px-8 py-3 rounded-full font-bold text-sm shadow-[0_0_30px_rgba(208,255,90,0.4)] hover:scale-110 transition-transform flex items-center gap-2 inline-flex"
+         >
+           Start Assessment <ArrowUpRight className="w-4 h-4" />
+         </motion.a>
+      </div>
+
+      {/* Floating UI Elements */}
+      <div className="relative z-20 w-full h-full flex-1 flex flex-col justify-between mt-10">
+        <div className="flex justify-between w-full">
+          <p className="text-white/70 text-sm max-w-[200px] leading-relaxed">
+            End-to-End MLOps pipeline for predictive healthcare diagnostics.
+          </p>
+          <div className="text-right">
+            <span className="text-white/50 text-xs uppercase tracking-widest">Version v1.2</span>
           </div>
         </div>
-        <p className="text-sm text-gray-500 font-medium leading-relaxed max-w-2xl">
-          VENA is a Global Clinical Research model specializing in Stroke Prediction with accreditations from major medical institutes. It processes 11 unique patient features to provide hyper-accurate diagnostics.
-        </p>
-      </motion.div>
+
+        <div className="flex justify-between items-end w-full mt-auto pb-10">
+          
+          {/* Left Bottom Floating Elements */}
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-4">
+              <div className="text-[#d0ff5a] text-5xl font-light">5110</div>
+              <div className="text-white">
+                <p className="font-bold text-sm">Clinical Records</p>
+                <p className="text-[10px] text-white/60">Kaggle Stroke Dataset</p>
+              </div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-6 py-2 w-fit">
+              <p className="text-white text-xs">Handling 95% extreme class imbalance</p>
+            </div>
+          </div>
+
+          {/* Right Bottom Elements */}
+          <div className="flex flex-col items-end gap-3">
+            <p className="text-white text-sm text-right leading-tight max-w-[200px]">
+              End-to-End MLOps Pipeline with DVC & MLflow
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="bg-[#4a637a] text-white px-3 py-1 rounded-full text-[10px] font-bold border border-white/20">PyTorch</div>
+              <div className="bg-[#4a637a] text-white px-3 py-1 rounded-full text-[10px] font-bold border border-white/20">FastAPI</div>
+            </div>
+            <a href="https://github.com/eneserbap/Vena" target="_blank" rel="noreferrer" className="text-[#d0ff5a] text-xs underline mt-2">
+              View Repository
+            </a>
+          </div>
+
+        </div>
+      </div>
     </section>
   );
 }

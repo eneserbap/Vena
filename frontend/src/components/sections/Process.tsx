@@ -4,86 +4,65 @@ import { motion } from 'framer-motion';
 
 export default function Process() {
   return (
-    <section className="min-h-screen bg-white py-32 px-10 relative overflow-hidden flex flex-col justify-center">
+    <section className="py-32 px-10 bg-gradient-to-b from-[#5c778e] to-[#455f75] flex flex-col items-center text-white">
       
-      {/* Big scrolling text (Marquee effect) */}
-      <div className="absolute top-32 left-0 w-full overflow-hidden whitespace-nowrap opacity-10">
-        <motion.div 
-          animate={{ x: [0, -1000] }} 
-          transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
-          className="text-[8rem] font-medium tracking-tighter"
-        >
-          HIGH PRECISION / GENETIC INSIGHT / ONCOLOGY RESEARCH / STROKE PREDICTION
-        </motion.div>
+      {/* Top Badge */}
+      <div className="bg-white/10 text-white border border-white/20 px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase mb-6">
+        [ Assessment ]
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center mt-48 relative z-10">
-        <motion.div 
-          initial={{ opacity: 0, x: -50 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1 }}
-        >
-          <h2 className="text-5xl font-medium leading-tight text-gray-900 mb-20 max-w-xl">
-            Our mission is to unravel the intricacies of your clinical data, providing you with <span className="text-gray-300">the most detailed diagnostic insights.</span>
-          </h2>
+      <h2 className="text-5xl font-medium mb-24 text-center max-w-xl leading-tight">
+        Your Journey to Better Diagnostics Starts Here
+      </h2>
 
-          <div className="grid grid-cols-2 gap-y-16 gap-x-10">
-            <div>
-              <p className="text-6xl font-light text-gray-900 mb-2">95<span className="text-3xl">%</span></p>
-              <div className="h-[1px] w-full bg-gray-200 mb-4"></div>
-              <p className="text-sm font-semibold text-gray-500 tracking-wide uppercase">AUROC Score</p>
-            </div>
-            <div>
-              <p className="text-6xl font-light text-gray-900 mb-2">50<span className="text-3xl">+</span></p>
-              <div className="h-[1px] w-full bg-gray-200 mb-4"></div>
-              <p className="text-sm font-semibold text-gray-500 tracking-wide uppercase">Countries in Service</p>
-            </div>
-            <div>
-              <p className="text-6xl font-light text-gray-900 mb-2">89<span className="text-3xl">%</span></p>
-              <div className="h-[1px] w-full bg-gray-200 mb-4"></div>
-              <p className="text-sm font-semibold text-gray-500 tracking-wide uppercase">Accuracy Rate</p>
-            </div>
-            <div>
-              <p className="text-6xl font-light text-gray-900 mb-2">30<span className="text-3xl">k+</span></p>
-              <div className="h-[1px] w-full bg-gray-200 mb-4"></div>
-              <p className="text-sm font-semibold text-gray-500 tracking-wide uppercase">Satisfied Customers</p>
+      <div className="max-w-5xl w-full flex flex-col gap-12">
+        
+        {/* Row 1 */}
+        <div className="flex bg-white/10 backdrop-blur-md border border-white/10 rounded-[2rem] overflow-hidden shadow-2xl h-[400px]">
+          <div className="w-1/2 p-12 flex flex-col justify-center">
+            <h3 className="text-3xl font-medium mb-4">Run Your AI Consultation</h3>
+            <p className="text-sm text-white/70 leading-relaxed mb-6">
+              Enter your clinical metrics into our secure Vena API to instantly receive a personalized stroke risk assessment powered by our trained deep learning model.
+            </p>
+            <div className="space-y-3">
+              <p className="text-xs font-bold text-white/50 uppercase tracking-wider mb-2">What's included</p>
+              {['Real-time inference', 'Clinical threshold checking', 'Risk factor highlights', 'Probability scoring', 'Explainable AI breakdown'].map((item, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#d0ff5a]"></div>
+                  <span className="text-xs text-white/90 font-medium">{item}</span>
+                </div>
+              ))}
             </div>
           </div>
-        </motion.div>
+          <div className="w-1/2">
+            <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1000&auto=format&fit=crop" className="w-full h-full object-cover opacity-80" alt="Consultation"/>
+          </div>
+        </div>
 
-        {/* Abstract Circular Diagram */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.8 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          className="relative h-[600px] flex items-center justify-center"
-        >
-          <span className="absolute top-0 right-10 text-xs font-bold uppercase tracking-[0.2em] text-gray-400">Vena's Precision Diagnostics</span>
-          
-          <div className="absolute w-[500px] h-[500px] rounded-full border border-gray-200 flex items-center justify-end pr-20">
-            <span className="absolute left-10 text-xs font-medium text-gray-500 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-purple-400"></span> Collaboration
-            </span>
-            <div className="w-[400px] h-[400px] rounded-full border border-gray-200 bg-gray-50/50 flex items-center justify-end pr-16">
-              <span className="absolute left-16 top-32 text-xs font-medium text-gray-500 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-purple-500"></span> Diagnostic
-              </span>
-              <div className="w-[280px] h-[280px] rounded-full border border-gray-200 bg-gray-100/50 flex items-center justify-end pr-10">
-                <span className="absolute right-32 bottom-20 text-xs font-medium text-gray-500 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-purple-600"></span> Interpretation
-                </span>
-                <div className="w-[150px] h-[150px] rounded-full bg-purple-100 flex items-center justify-center relative shadow-xl shadow-purple-500/20">
-                  <div className="w-4 h-4 rounded-full bg-purple-600 animate-pulse"></div>
-                  <span className="absolute -top-6 -right-10 whitespace-nowrap text-xs font-medium text-gray-900">
-                    Sample Processing
-                  </span>
-                </div>
+        {/* Row 2 */}
+        <div className="flex bg-white/10 backdrop-blur-md border border-white/10 rounded-[2rem] overflow-hidden shadow-2xl h-[400px]">
+          <div className="w-1/2 p-12 flex flex-col justify-center">
+            <h3 className="text-3xl font-medium mb-4">Get a Personalized Risk Report</h3>
+            <p className="text-sm text-white/70 leading-relaxed mb-6">
+              Based on your data inputs, our PyTorch backend computes a detailed breakdown of your health trajectory, designed to support your preventative healthcare objectives.
+            </p>
+            <div className="space-y-3">
+              <p className="text-xs font-bold text-white/50 uppercase tracking-wider mb-2">Capabilities</p>
+              <div className="flex items-center gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#d0ff5a]"></div>
+                <span className="text-xs text-white/90 font-medium">Continuous model monitoring</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#d0ff5a]"></div>
+                <span className="text-xs text-white/90 font-medium">HIPAA compliant data processing</span>
               </div>
             </div>
           </div>
-        </motion.div>
+          <div className="w-1/2">
+            <img src="https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?q=80&w=1000&auto=format&fit=crop" className="w-full h-full object-cover opacity-80" alt="Doctor Report"/>
+          </div>
+        </div>
+
       </div>
     </section>
   );

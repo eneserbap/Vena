@@ -53,7 +53,7 @@ export default function Assessment() {
   };
 
   return (
-    <section className="min-h-screen bg-[#F8F9FA] py-32 px-10 relative overflow-hidden flex justify-center items-center">
+    <section id="assessment" className="min-h-screen bg-[#F8F9FA] py-32 px-10 relative overflow-hidden flex justify-center items-center">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-gradient-to-bl from-purple-200/50 to-blue-200/50 blur-[120px] pointer-events-none -z-10"></div>
       
       <div className="max-w-4xl w-full">
