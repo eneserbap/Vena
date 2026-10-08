@@ -24,7 +24,7 @@ export default function Hero() {
 
       {/* Massive Foreground Text */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full flex justify-center pointer-events-none z-10">
-        <h1 className="text-[5rem] md:text-[7rem] xl:text-[9rem] font-bold text-[#e74c3c] tracking-tighter leading-none whitespace-nowrap opacity-90">
+        <h1 className="text-[7rem] md:text-[10rem] xl:text-[14rem] font-bold text-[#8a0303] tracking-tighter leading-none whitespace-nowrap opacity-90">
           VENA PROJECT
         </h1>
       </div>
