@@ -9,9 +9,9 @@ export default function Hero() {
     <section className="relative min-h-screen bg-gradient-to-b from-[#637d95] to-[#4a637a] pt-32 pb-20 px-12 overflow-hidden flex flex-col items-center">
       
       {/* Massive Background Text */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full flex justify-between px-20 pointer-events-none z-0">
-        <h1 className="text-[12rem] font-light text-white/90 tracking-tighter">VENA</h1>
-        <h1 className="text-[12rem] font-light text-white/90 tracking-tighter">PROJECT</h1>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none z-0">
+        <h1 className="absolute right-[52%] top-1/2 -translate-y-1/2 text-[9rem] xl:text-[11rem] font-light text-white/90 tracking-tighter">VENA</h1>
+        <h1 className="absolute left-[52%] top-1/2 -translate-y-1/2 text-[9rem] xl:text-[11rem] font-light text-white/90 tracking-tighter">PROJECT</h1>
       </div>
 
       {/* Grid Pattern Overlay */}
