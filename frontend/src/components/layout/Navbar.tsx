@@ -1,32 +1,26 @@
 "use client";
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Search, Volume2 } from 'lucide-react';
 
 export default function Navbar() {
   return (
-    <motion.nav 
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-10 py-6 mix-blend-difference text-white"
-    >
-      <div className="flex items-center gap-12">
-        <span className="text-xl font-bold tracking-[0.2em]">VENA</span>
-        <div className="hidden md:flex items-center gap-4 cursor-pointer hover:opacity-70 transition-opacity">
-          <div className="w-8 h-[1px] bg-white"></div>
-          <span className="text-sm font-medium uppercase tracking-widest">Menu</span>
-        </div>
+    <nav className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-12 py-8 text-white">
+      <div className="flex items-center gap-2">
+        <div className="w-2.5 h-2.5 rounded-full bg-[#d0ff5a]"></div>
+        <span className="text-xl font-bold tracking-widest">VENA</span>
       </div>
       
-      <div className="flex items-center gap-6">
-        <button className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
-          <Search className="w-5 h-5" />
-        </button>
-        <button className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center hover:bg-white hover:text-black transition-all">
-          <Volume2 className="w-5 h-5" />
-        </button>
+      <div className="hidden md:flex items-center gap-10 text-sm font-medium text-white/80">
+        <a href="#" className="text-[#d0ff5a]">Home</a>
+        <a href="#" className="hover:text-white transition-colors">About</a>
+        <a href="#" className="hover:text-white transition-colors">Architecture</a>
+        <a href="#" className="hover:text-white transition-colors">Pipeline</a>
+        <a href="#" className="hover:text-white transition-colors">Contact</a>
       </div>
-    </motion.nav>
+
+      <button className="px-8 py-3 rounded-full border border-white/30 hover:bg-white hover:text-[#556f87] transition-colors text-sm font-semibold">
+        Run Model
+      </button>
+    </nav>
   );
 }

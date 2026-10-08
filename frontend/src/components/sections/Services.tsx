@@ -12,7 +12,7 @@ export default function Services() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
-        className="bg-[#2c3e50] text-[#86bfa3] px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase mb-6"
+        className="bg-slate-900 text-[#d0ff5a] px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase mb-6"
       >
         [ Core Capabilities ]
       </motion.div>
