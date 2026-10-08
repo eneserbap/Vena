@@ -179,10 +179,17 @@ docker run --gpus all -v $(pwd)/data:/app/data vena-train:latest
 - [x] GitHub Actions pipeline (Automated lint, type-check, and test)
 - [x] Cloud Deployment via Render (with Anti-Sleep Hack)
 
-### 🔄 Phase 5 — Refinement & Web Interface *(Current)*
-- [ ] Med-Tech Landing Page (Beautiful UI)
-- [ ] API Security (Rate Limiting)
-- [ ] (Future) Model Monitoring & Drift Detection
+### ✅ Phase 5 — Refinement & Web Interface
+- [x] Med-Tech Landing Page (Beautiful UI)
+- [x] Responsive Design & Vercel Deployment
+- [x] API Security (Rate Limiting with SlowAPI)
+
+### 🔄 Phase 6 — Explainable AI & Human-in-the-Loop (TÜBİTAK Ready) *(Current)*
+- [ ] Implement SHAP (SHapley Additive exPlanations) for transparent predictions
+- [ ] Generate clinical "Doctor's Report" explaining risk factors mathematically
+- [ ] Out-of-Distribution (OOD) Detection: Warn doctors if input data has low confidence/anomalies
+- [ ] Doctor Feedback Loop (Active Learning): Allow doctors to flag incorrect predictions for future retraining
+- [ ] (Future) Model Monitoring & Data Drift Detection
 
 ---
 
