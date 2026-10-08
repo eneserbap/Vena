@@ -1,5 +1,8 @@
 <div align="center">
 
+![Vena Banner](banner.png)
+<br/>
+
 <img src="https://img.shields.io/badge/Status-Phase%201%20%E2%80%94%20Scaffolding-blue?style=for-the-badge" />
 <img src="https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white" />
 <img src="https://img.shields.io/badge/PyTorch-2.x-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white" />
@@ -169,16 +172,16 @@ docker run --gpus all -v $(pwd)/data:/app/data vena-train:latest
 - [x] MLflow experiment tracking (metrics, params, artefacts per run)
 - [x] Early stopping with configurable patience
 
-### 🔄 Phase 4 — CI/CD & Deployment *(Current)*
+### ✅ Phase 4 — CI/CD & Deployment
 - [x] REST API inference endpoint (FastAPI)
 - [x] Docker containerization for the Backend API
 - [x] GitHub Actions pipeline (Automated lint, type-check, and test)
-- [ ] Cloud Deployment strategy (Hugging Face Spaces / Render)
+- [x] Cloud Deployment via Render (with Anti-Sleep Hack)
 
-### 🔮 Phase 5 — Monitoring & Reliability (Future Scope)
-- [ ] Data & Concept Drift detection with Evidently
-- [ ] System health monitoring with Prometheus
-- [ ] Automated retrain pipelines on data drift
+### 🔄 Phase 5 — Refinement & Web Interface *(Current)*
+- [ ] Med-Tech Landing Page (Beautiful UI)
+- [ ] API Security (Rate Limiting)
+- [ ] (Future) Model Monitoring & Drift Detection
 
 ---
 

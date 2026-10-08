@@ -45,13 +45,19 @@ class PredictionResult(BaseModel):
 async def anti_sleep_ping():
     """Hacker-style Anti-Sleep mechanism for Render free tier."""
     url = "https://vena-kbet.onrender.com/"
+    # Gerçek bir tarayıcı taklidi yapıyoruz ki Render firewall engellemesin
+    req = urllib.request.Request(
+        url,
+        headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/117.0.0.0 Safari/537.36'}
+    )
     while True:
         # 5 ile 14 dakika arası rastgele bekle
         sleep_time = random.randint(5 * 60, 14 * 60)
         await asyncio.sleep(sleep_time)
         try:
             print(f"🕵️‍♂️ Anti-Sleep Hack: Pinging {url} to keep Render awake...")
-            urllib.request.urlopen(url)
+            # Bloklamaması için işlemi thread'e devrediyoruz
+            await asyncio.to_thread(urllib.request.urlopen, req, timeout=10)
             print("🕵️‍♂️ Ping successful!")
         except Exception as e:
             print(f"🕵️‍♂️ Anti-Sleep Hack failed: {e}")
