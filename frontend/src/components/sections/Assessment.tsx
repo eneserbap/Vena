@@ -1,11 +1,13 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Activity, Heart, ActivitySquare, ArrowRight, Loader2, CheckCircle2, Download } from 'lucide-react';
-import { usePDF } from 'react-to-pdf';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 export default function Assessment() {
   const [loading, setLoading] = useState(false);
+  const [downloadingPDF, setDownloadingPDF] = useState(false);
   const [result, setResult] = useState<{ stroke_risk_percentage: number; is_high_risk: boolean; doctors_report?: string } | null>(null);
   const [formData, setFormData] = useState({
     gender: 'Female',
@@ -18,10 +20,38 @@ export default function Assessment() {
     smoking_status: 'never smoked'
   });
   
-  const { toPDF, targetRef } = usePDF({
-    filename: `Vena_Clinical_Report.pdf`,
-    page: { format: 'A4' }
-  });
+  const targetRef = useRef<HTMLDivElement>(null);
+
+  const handleDownloadPDF = async () => {
+    if (!targetRef.current) return;
+    setDownloadingPDF(true);
+    
+    try {
+      const element = targetRef.current;
+      // Temporarily make it visible to canvas by removing opacity-0
+      element.classList.remove('opacity-0');
+      
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL('image/png');
+      
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Vena_Clinical_Report.pdf`);
+      
+    } catch (error) {
+      console.error('PDF Generation Failed', error);
+      alert('Could not generate PDF. Please try again.');
+    } finally {
+      // Hide it back
+      if (targetRef.current) {
+        targetRef.current.classList.add('opacity-0');
+      }
+      setDownloadingPDF(false);
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -205,11 +235,12 @@ export default function Assessment() {
               
               <div className="mt-12 flex flex-col md:flex-row justify-center items-center gap-4">
                 <button 
-                  onClick={() => toPDF()}
-                  className="px-10 py-4 rounded-full font-semibold text-white bg-black transition-colors shadow-sm hover:bg-gray-800 flex items-center gap-2 w-full md:w-auto justify-center"
+                  onClick={handleDownloadPDF}
+                  disabled={downloadingPDF}
+                  className="px-10 py-4 rounded-full font-semibold text-white bg-black transition-colors shadow-sm hover:bg-gray-800 flex items-center gap-2 w-full md:w-auto justify-center disabled:opacity-70"
                 >
-                  <Download className="w-5 h-5" />
-                  Download Official Report
+                  {downloadingPDF ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
+                  {downloadingPDF ? 'Generating...' : 'Download Official Report'}
                 </button>
                 <button 
                   onClick={() => setResult(null)}
@@ -220,8 +251,7 @@ export default function Assessment() {
               </div>
 
               {/* Hidden A4 Template for PDF Generation */}
-              <div className="absolute top-0 left-0 w-full opacity-0 pointer-events-none -z-50">
-                <div ref={targetRef} className="w-[794px] min-h-[1123px] bg-white p-16 text-black font-sans text-left">
+              <div ref={targetRef} className="absolute left-[-9999px] top-[0] w-[794px] min-h-[1123px] bg-white p-16 text-black font-sans text-left">
                   {/* Header */}
                   <div className="flex justify-between items-center border-b-4 border-black pb-8 mb-10">
                     <div>
@@ -301,7 +331,6 @@ export default function Assessment() {
                     </div>
                   </div>
                 </div>
-              </div>
             </div>
           )}
         </motion.div>
