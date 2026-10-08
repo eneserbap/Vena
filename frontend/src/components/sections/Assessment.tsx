@@ -32,7 +32,8 @@ export default function Assessment() {
     setLoading(true);
     
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 
+        (process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vena-kbet.onrender.com');
       const response = await fetch(`${apiUrl}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
