@@ -1,8 +1,9 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Activity, Heart, ActivitySquare, ArrowRight, Loader2, CheckCircle2, Download } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Cell } from 'recharts';
+import { useReactToPrint } from 'react-to-print';
 
 export default function Assessment() {
   const [loading, setLoading] = useState(false);
@@ -18,9 +19,12 @@ export default function Assessment() {
     smoking_status: 'never smoked'
   });
 
-  const handleDownloadPDF = () => {
-    window.print();
-  };
+  const targetRef = useRef<HTMLDivElement>(null);
+
+  const handleDownloadPDF = useReactToPrint({
+    contentRef: targetRef,
+    documentTitle: 'Vena_Clinical_Report',
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -226,8 +230,9 @@ export default function Assessment() {
 
     {/* Hidden A4 Template for PDF Generation */}
     {result && (
-      <div className="hidden print:block w-[794px] min-h-[1123px] bg-white p-16 text-black font-sans text-left mx-auto">
-        {/* Header */}
+      <div className="absolute left-[-9999px] top-[0px]">
+        <div ref={targetRef} className="w-[794px] min-h-[1123px] bg-white p-16 text-black font-sans text-left mx-auto">
+          {/* Header */}
                   <div className="flex justify-between items-center border-b-4 border-black pb-8 mb-10">
                     <div>
                       <h1 className="text-5xl font-black tracking-tighter mb-2">VENA<span className="text-gray-400">ML</span></h1>
@@ -335,6 +340,7 @@ export default function Assessment() {
                       Not a substitute for professional medical diagnosis.
                     </div>
                   </div>
+        </div>
       </div>
     )}
     </>
