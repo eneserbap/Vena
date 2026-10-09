@@ -2,7 +2,6 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Activity, Heart, ActivitySquare, ArrowRight, Loader2, CheckCircle2, Download } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Cell } from 'recharts';
 import { useReactToPrint } from 'react-to-print';
 
 export default function Assessment() {
@@ -231,7 +230,13 @@ export default function Assessment() {
     {/* Hidden A4 Template for PDF Generation */}
     {result && (
       <div className="absolute left-[-9999px] top-[0px]">
-        <div ref={targetRef} className="w-[794px] min-h-[1123px] bg-white p-16 text-black font-sans text-left mx-auto">
+        <div ref={targetRef} className="w-[794px] h-[1123px] overflow-hidden bg-white p-16 text-black font-sans text-left mx-auto flex flex-col box-border">
+          <style type="text/css" media="print">
+            {`
+              @page { size: A4 portrait; margin: 0mm; }
+              body { margin: 0; padding: 0; }
+            `}
+          </style>
           {/* Header */}
                   <div className="flex justify-between items-center border-b-4 border-black pb-8 mb-10">
                     <div>
@@ -288,36 +293,6 @@ export default function Assessment() {
                           <p className="text-base text-gray-500">Predicted Probability of Stroke Event within clinical timeframe.</p>
                       </div>
                     </div>
-                  </div>
-
-                  {/* Comparative Chart */}
-                  <h2 className="text-2xl font-bold mb-6 uppercase tracking-widest border-b-2 border-gray-100 pb-2">Comparative Risk Analysis</h2>
-                  <div className="mb-10 flex justify-center">
-                    <BarChart 
-                      width={650} 
-                      height={200} 
-                      data={[
-                        { name: 'Healthy Baseline', risk: 4.5, color: '#10b981' },
-                        { name: 'Patient Risk', risk: Number(result.stroke_risk_percentage.toFixed(1)), color: result.is_high_risk ? '#e11d48' : '#3b82f6' },
-                        { name: 'Critical Threshold', risk: 50.0, color: '#f59e0b' },
-                      ]} 
-                      layout="vertical" 
-                      margin={{ top: 0, right: 30, left: 40, bottom: 0 }}
-                    >
-                      <XAxis type="number" domain={[0, 100]} tickFormatter={(val) => `${val}%`} stroke="#9ca3af" />
-                      <YAxis dataKey="name" type="category" width={140} tick={{fill: '#374151', fontSize: 13, fontWeight: 600}} stroke="#9ca3af" />
-                      <Bar dataKey="risk" radius={[0, 4, 4, 0]} barSize={24} label={{ position: 'right', formatter: (val: any) => `${val}%`, fill: '#4b5563', fontWeight: 'bold' }}>
-                        {
-                          [0,1,2].map((index) => (
-                            <Cell key={`cell-${index}`} fill={[
-                              '#10b981', 
-                              result.is_high_risk ? '#e11d48' : '#3b82f6', 
-                              '#f59e0b'
-                            ][index]} />
-                          ))
-                        }
-                      </Bar>
-                    </BarChart>
                   </div>
 
                   {/* SHAP Report */}
