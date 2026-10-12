@@ -173,6 +173,7 @@ docker run --gpus all -v $(pwd)/data:/app/data vena-train:latest
 - [x] MLflow experiment tracking (metrics, params, artefacts per run)
 - [x] Early stopping with configurable patience
 - [x] Real-time Prometheus metrics instrumentation (`/metrics` endpoint for latency, throughput, system health)
+- [x] Interactive Live Telemetry & Observability Dashboard (`/dashboard` and `/monitoring` scraping `/metrics` in real-time)
 
 ### ✅ Phase 4 — CI/CD & Deployment
 - [x] REST API inference endpoint (FastAPI)

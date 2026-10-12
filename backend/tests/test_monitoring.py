@@ -14,13 +14,34 @@ def test_metrics_endpoint_registered() -> None:
 
 
 def test_health_check_references_metrics() -> None:
-    """Verify that health check reports status and metrics location."""
+    """Verify that health check reports status, metrics, and dashboard location."""
     from vena.api import health_check
 
     response = health_check()
     assert response["status"] == "healthy"
     assert "metrics" in response
     assert response["metrics"] == "/metrics"
+    assert "dashboard" in response
+    assert response["dashboard"] == "/dashboard"
+
+
+def test_dashboard_endpoints_registered() -> None:
+    """Verify that /dashboard and /monitoring routes are registered in FastAPI."""
+    routes = [route.path for route in app.routes if hasattr(route, "path")]
+    assert "/dashboard" in routes, "Dashboard route must be registered"
+    assert "/monitoring" in routes, "Monitoring alias route must be registered"
+
+
+def test_dashboard_html_content() -> None:
+    """Verify that dashboard renders HTML referencing /metrics and Chart.js."""
+    from vena.api import monitoring_dashboard
+
+    response = monitoring_dashboard()
+    assert response.status_code == 200
+    html = bytes(response.body).decode("utf-8")
+    assert "/metrics" in html
+    assert "chart.js" in html.lower() or "chartjs" in html.lower()
+    assert "VENA // Telemetry Engine" in html
 
 
 def test_metrics_endpoint_response() -> None:

@@ -17,6 +17,7 @@ import random
 
 from vena.data import load_raw_data, preprocess
 from vena.model import StrokeMLP
+from vena.dashboard import get_dashboard_html
 
 # Global variables for caching preprocessors and model
 MODEL = None
@@ -188,9 +189,22 @@ async def custom_api_docs() -> HTMLResponse:
     return HTMLResponse(content=html_content)
 
 
+@app.get("/dashboard", response_class=HTMLResponse, include_in_schema=True, tags=["Monitoring"])
+@app.get("/monitoring", response_class=HTMLResponse, include_in_schema=False)
+def monitoring_dashboard() -> HTMLResponse:
+    """Returns the live visual telemetry & Prometheus monitoring dashboard."""
+    return HTMLResponse(content=get_dashboard_html())
+
+
 @app.get("/")
 def health_check() -> dict[str, str]:
-    return {"status": "healthy", "model": "StrokeMLP", "metrics": "/metrics"}
+    return {
+        "status": "healthy",
+        "model": "StrokeMLP",
+        "docs": "/docs",
+        "metrics": "/metrics",
+        "dashboard": "/dashboard"
+    }
 
 
 @app.post("/predict", response_model=PredictionResult)
