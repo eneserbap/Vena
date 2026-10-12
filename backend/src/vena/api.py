@@ -127,6 +127,7 @@ async def lifespan(app: FastAPI):
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Request
+from prometheus_fastapi_instrumentator import Instrumentator
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -153,6 +154,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ─── Prometheus Monitoring ────────────────────────────────────────────────────
+# Collect request latency, status codes, and system throughput, exposed at /metrics
+Instrumentator().instrument(app).expose(app, endpoint="/metrics", include_in_schema=True, tags=["Monitoring"])
 
 @app.get("/docs", include_in_schema=False)
 async def custom_api_docs() -> HTMLResponse:
@@ -185,7 +190,7 @@ async def custom_api_docs() -> HTMLResponse:
 
 @app.get("/")
 def health_check() -> dict[str, str]:
-    return {"status": "healthy", "model": "StrokeMLP"}
+    return {"status": "healthy", "model": "StrokeMLP", "metrics": "/metrics"}
 
 
 @app.post("/predict", response_model=PredictionResult)

@@ -172,6 +172,7 @@ docker run --gpus all -v $(pwd)/data:/app/data vena-train:latest
 - [x] Replace accuracy with **AUROC, F1, Precision, Recall** (imbalanced dataset)
 - [x] MLflow experiment tracking (metrics, params, artefacts per run)
 - [x] Early stopping with configurable patience
+- [x] Real-time Prometheus metrics instrumentation (`/metrics` endpoint for latency, throughput, system health)
 
 ### ✅ Phase 4 — CI/CD & Deployment
 - [x] REST API inference endpoint (FastAPI)
