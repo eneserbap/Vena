@@ -171,10 +171,96 @@ async def custom_api_docs() -> HTMLResponse:
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <style>
-          body { margin: 0; padding: 0; background-color: #0f0f11; }
+          body { 
+            margin: 0; 
+            padding: 0; 
+            background-color: #0f0f11; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+          }
+          .vena-nav-bar {
+            position: fixed;
+            top: 14px;
+            right: 20px;
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          }
+          .vena-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 9999px;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+          }
+          .btn-dashboard {
+            background: rgba(208, 255, 90, 0.15);
+            color: #d0ff5a;
+            border: 1px solid rgba(208, 255, 90, 0.4);
+          }
+          .btn-dashboard:hover {
+            background: #d0ff5a;
+            color: #000;
+            transform: translateY(-1px);
+            box-shadow: 0 0 20px rgba(208, 255, 90, 0.4);
+          }
+          .btn-metrics {
+            background: rgba(30, 41, 59, 0.85);
+            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+          }
+          .btn-metrics:hover {
+            background: rgba(51, 65, 85, 0.95);
+            color: #f8fafc;
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+          }
+          .pulse-dot {
+            width: 7px;
+            height: 7px;
+            background-color: #d0ff5a;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #d0ff5a;
+            animation: pulse-ring 1.8s infinite;
+          }
+          @keyframes pulse-ring {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.5; }
+          }
+          @media (max-width: 640px) {
+            .vena-nav-bar {
+              top: 10px;
+              right: 10px;
+              gap: 6px;
+            }
+            .vena-nav-btn {
+              padding: 5px 10px;
+              font-size: 11px;
+            }
+          }
         </style>
       </head>
       <body>
+        <!-- Floating Navigation for Telemetry & Metrics -->
+        <div class="vena-nav-bar">
+          <a href="/dashboard" class="vena-nav-btn btn-dashboard" title="Live Observability Dashboard">
+            <span class="pulse-dot"></span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+            <span>Live Dashboard</span>
+          </a>
+          <a href="/metrics" class="vena-nav-btn btn-metrics" target="_blank" title="Raw Prometheus OpenMetrics Feed">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg>
+            <span>/metrics</span>
+          </a>
+        </div>
+
         <!-- Scalar API Reference -->
         <script 
             id="api-reference" 

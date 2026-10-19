@@ -44,6 +44,18 @@ def test_dashboard_html_content() -> None:
     assert "VENA // Telemetry Engine" in html
 
 
+def test_docs_has_navigation_buttons() -> None:
+    """Verify that /docs HTML includes links to /dashboard and /metrics."""
+    import asyncio
+    from vena.api import custom_api_docs
+
+    response = asyncio.run(custom_api_docs())
+    assert response.status_code == 200
+    html = bytes(response.body).decode("utf-8")
+    assert 'href="/dashboard"' in html
+    assert 'href="/metrics"' in html
+
+
 def test_metrics_endpoint_response() -> None:
     """Verify that /metrics endpoint returns HTTP 200 with Prometheus payload."""
     import asyncio
