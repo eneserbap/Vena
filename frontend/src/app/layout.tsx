@@ -24,19 +24,22 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Vena | Explainable AI & Deep Learning for Stroke Risk Prediction",
+    default: "Vena Project | Explainable AI & Deep Learning for Stroke Risk Prediction",
     template: "%s | Vena Stroke AI",
   },
   description:
-    "Vena is a production-grade healthcare AI platform predicting stroke risk in real-time with PyTorch MLP, SHAP explainability, and full MLOps observability.",
-  applicationName: "Vena Health AI",
+    "Vena Project is an end-to-end healthcare AI platform predicting stroke risk in real-time with PyTorch MLP, SHAP explainability, and full MLOps observability.",
+  applicationName: "Vena Project Health AI",
   authors: [
     { name: "Monolith Studios", url: "https://monolithstudios.dev" },
     { name: "Enes Erbap", url: "https://github.com/eneserbap" },
   ],
   generator: "Next.js",
   keywords: [
+    "Vena Project",
     "Vena",
+    "Vena Stroke",
+    "Vena MLOps",
     "Stroke Risk Prediction",
     "İnme Riski Tahmini",
     "Healthcare AI",
@@ -55,7 +58,7 @@ export const metadata: Metadata = {
     canonical: siteUrl,
   },
   openGraph: {
-    title: "Vena | Explainable AI & Deep Learning for Stroke Risk Prediction",
+    title: "Vena Project | Real-time Deep Learning Stroke Risk Prediction & Explainable AI",
     description:
       "Clinical-grade stroke risk assessment powered by PyTorch MLP and SHAP mathematical interpretability.",
     url: siteUrl,
