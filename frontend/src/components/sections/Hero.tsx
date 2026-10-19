@@ -29,17 +29,18 @@ export default function Hero() {
       <div className="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full justify-center pointer-events-none z-10 px-4">
         <h1 className="text-[10rem] xl:text-[14rem] font-bold text-[#d0ff5a] tracking-tighter leading-none whitespace-nowrap opacity-90 text-center">
           VENA PROJECT
+          <span className="sr-only"> - Real-time Explainable AI & Deep Learning for Stroke Risk Prediction by Monolith Studios</span>
         </h1>
       </div>
 
-      {/* Massive Foreground Text - Mobile */}
-      <div className="flex md:hidden absolute inset-0 flex-col justify-between pt-[140px] pb-[160px] pointer-events-none z-10 px-4">
-        <h1 className="text-8xl font-bold text-[#d0ff5a] tracking-tighter leading-none text-center opacity-90">
+      {/* Massive Foreground Text - Mobile (Visual only) */}
+      <div className="flex md:hidden absolute inset-0 flex-col justify-between pt-[140px] pb-[160px] pointer-events-none z-10 px-4" aria-hidden="true">
+        <div className="text-8xl font-bold text-[#d0ff5a] tracking-tighter leading-none text-center opacity-90">
           VENA
-        </h1>
-        <h1 className="text-8xl font-bold text-[#d0ff5a] tracking-tighter leading-none text-center opacity-90">
+        </div>
+        <div className="text-8xl font-bold text-[#d0ff5a] tracking-tighter leading-none text-center opacity-90">
           PROJECT
-        </h1>
+        </div>
       </div>
 
       <div className="absolute bottom-6 md:bottom-auto md:top-1/2 left-1/2 -translate-x-1/2 md:translate-y-[340px] z-30">
