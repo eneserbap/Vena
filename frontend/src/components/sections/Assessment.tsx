@@ -9,12 +9,12 @@ export default function Assessment() {
   const [result, setResult] = useState<{ stroke_risk_percentage: number; is_high_risk: boolean; doctors_report?: string } | null>(null);
   const [formData, setFormData] = useState({
     gender: 'Female',
-    age: 45,
+    age: '45',
     hypertension: 0,
     heart_disease: 0,
     Residence_type: 'Urban',
-    avg_glucose_level: 105.5,
-    bmi: 28.0,
+    avg_glucose_level: '105.5',
+    bmi: '28.0',
     smoking_status: 'never smoked'
   });
 
@@ -25,27 +25,49 @@ export default function Assessment() {
     documentTitle: 'Vena_Clinical_Report',
   });
 
+  const numericFields = ['age', 'avg_glucose_level', 'bmi'];
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: ['age', 'hypertension', 'heart_disease', 'avg_glucose_level', 'bmi'].includes(name) 
-        ? Number(value) 
-        : value
-    }));
+    if (numericFields.includes(name)) {
+      // Allow empty string and valid numeric input (including decimals)
+      if (value === '' || /^\d*\.?\d*$/.test(value)) {
+        setFormData(prev => ({ ...prev, [name]: value }));
+      }
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleNumericBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    // On blur, clean up the value (remove leading zeros, set default if empty)
+    if (value === '') return; // allow empty, will be validated on submit
+    const parsed = parseFloat(value);
+    if (!isNaN(parsed)) {
+      setFormData(prev => ({ ...prev, [name]: String(parsed) }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
+    // Convert string numeric fields to actual numbers for the API
+    const payload = {
+      ...formData,
+      age: Number(formData.age) || 0,
+      avg_glucose_level: Number(formData.avg_glucose_level) || 0,
+      bmi: Number(formData.bmi) || 0,
+    };
+
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 
         (process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://vena-kbet.onrender.com');
       const response = await fetch(`${apiUrl}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) throw new Error('Network error');
@@ -89,8 +111,8 @@ export default function Assessment() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Age</label>
-                  <input type="number" name="age" value={formData.age} onChange={handleInputChange} 
-                    className="w-full bg-gray-50 border-none rounded-2xl px-5 py-4 text-gray-900 outline-none focus:ring-2 focus:ring-purple-200 transition-all font-medium text-lg" />
+                  <input type="text" inputMode="numeric" name="age" value={formData.age} onChange={handleInputChange} onBlur={handleNumericBlur}
+                    placeholder="e.g. 45" className="w-full bg-gray-50 border-none rounded-2xl px-5 py-4 text-gray-900 outline-none focus:ring-2 focus:ring-purple-200 transition-all font-medium text-lg" />
                 </div>
 
                 <div className="space-y-2">
@@ -104,14 +126,14 @@ export default function Assessment() {
 
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2"><ActivitySquare className="w-4 h-4 text-purple-400"/> Avg Glucose Level</label>
-                  <input type="number" step="0.1" name="avg_glucose_level" value={formData.avg_glucose_level} onChange={handleInputChange} 
-                    className="w-full bg-gray-50 border-none rounded-2xl px-5 py-4 text-gray-900 outline-none focus:ring-2 focus:ring-purple-200 transition-all font-medium text-lg" />
+                  <input type="text" inputMode="decimal" name="avg_glucose_level" value={formData.avg_glucose_level} onChange={handleInputChange} onBlur={handleNumericBlur}
+                    placeholder="e.g. 105.5" className="w-full bg-gray-50 border-none rounded-2xl px-5 py-4 text-gray-900 outline-none focus:ring-2 focus:ring-purple-200 transition-all font-medium text-lg" />
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-2"><Activity className="w-4 h-4 text-blue-400"/> BMI</label>
-                  <input type="number" step="0.1" name="bmi" value={formData.bmi} onChange={handleInputChange} 
-                    className="w-full bg-gray-50 border-none rounded-2xl px-5 py-4 text-gray-900 outline-none focus:ring-2 focus:ring-purple-200 transition-all font-medium text-lg" />
+                  <input type="text" inputMode="decimal" name="bmi" value={formData.bmi} onChange={handleInputChange} onBlur={handleNumericBlur}
+                    placeholder="e.g. 28.0" className="w-full bg-gray-50 border-none rounded-2xl px-5 py-4 text-gray-900 outline-none focus:ring-2 focus:ring-purple-200 transition-all font-medium text-lg" />
                 </div>
 
                 <div className="space-y-2">
