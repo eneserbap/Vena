@@ -17,7 +17,14 @@ import mlflow
 import mlflow.pytorch
 import torch
 import torch.nn as nn
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score  # type: ignore[import]
+from sklearn.metrics import (  # type: ignore[import]
+    accuracy_score,
+    average_precision_score,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+)
 from torch.utils.data import DataLoader, TensorDataset
 
 if TYPE_CHECKING:
@@ -80,14 +87,14 @@ def evaluate(
     loader: DataLoader[TensorDataset],
     criterion: nn.Module,
     device: torch.device,
-) -> tuple[float, float, float, float, float, float]:
-    """Evaluate model and return advanced classification metrics."""
+) -> tuple[float, float, float, float, float, float, float]:
+    """Evaluate model and return advanced classification metrics including AUPRC."""
     model.eval()
     total_loss = 0.0
-    
-    all_targets = []
-    all_preds = []
-    all_probs = []
+
+    all_targets: list[float] = []
+    all_preds: list[float] = []
+    all_probs: list[float] = []
 
     with torch.no_grad():
         for X_batch, y_batch in loader:
@@ -101,25 +108,31 @@ def evaluate(
             # Probabilities and hard predictions
             probs = torch.sigmoid(logits)
             preds = (probs >= 0.5).float()
-            
-            all_targets.extend(y_batch.cpu().numpy())
-            all_preds.extend(preds.cpu().numpy())
-            all_probs.extend(probs.cpu().numpy())
+
+            all_targets.extend(y_batch.cpu().numpy().tolist())
+            all_preds.extend(preds.cpu().numpy().tolist())
+            all_probs.extend(probs.cpu().numpy().tolist())
 
     mean_loss = total_loss / len(loader)
-    
-    # Calculate Phase 3 Metrics
+
+    # Calculate Phase 3 & Imbalanced Benchmark Metrics
     acc = accuracy_score(all_targets, all_preds)
     f1 = f1_score(all_targets, all_preds, zero_division=0)
     prec = precision_score(all_targets, all_preds, zero_division=0)
     rec = recall_score(all_targets, all_preds, zero_division=0)
-    
+
     try:
         auroc = roc_auc_score(all_targets, all_probs)
     except ValueError:
         auroc = 0.5  # Fallback if only one class is present in the batch
 
-    return mean_loss, acc, f1, prec, rec, auroc
+    # AUPRC (Area Under Precision-Recall Curve): Gold standard for 95-5 imbalance
+    try:
+        auprc = average_precision_score(all_targets, all_probs)
+    except ValueError:
+        auprc = 0.0
+
+    return mean_loss, acc, f1, prec, rec, auroc, auprc
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -152,7 +165,7 @@ def save_checkpoint(
 
 def run_training(cfg: "DictConfig") -> None:
     from vena.data import build_dataloaders, load_raw_data, preprocess, split_and_scale
-    from vena.model import StrokeMLP
+    from vena.model import DualTowerStrokeTransformer, StrokeMLP
 
     device = resolve_device()
 
@@ -166,44 +179,70 @@ def run_training(cfg: "DictConfig") -> None:
         X_train, X_test, y_train, y_test, cfg.training.batch_size
     )
 
-    # ── Model ─────────────────────────────────────────────────────────────────
-    model = StrokeMLP(
-        input_dim=X_train.shape[1],
-        hidden_layers=list(cfg.model.hidden_layers),
-        output_dim=cfg.model.output_dim,
-        dropout=cfg.model.dropout,
-    ).to(device)
+    # ── Model Architecture Selection (DualTower vs Baseline MLP) ──────────────
+    arch_type = getattr(cfg.model, "architecture", "DualTowerStrokeTransformer")
+    logger.info("Selected model architecture: %s", arch_type)
 
-    pos_weight = torch.tensor([cfg.training.pos_weight], device=device)
+    if arch_type == "DualTowerStrokeTransformer":
+        model = DualTowerStrokeTransformer(
+            input_dim=X_train.shape[1],
+            numerical_indices=[0, 5, 6],  # age, glucose, bmi
+            d_model=getattr(cfg.model, "d_model", 64),
+            nhead=getattr(cfg.model, "nhead", 4),
+            num_layers=getattr(cfg.model, "num_layers", 2),
+            d_cat=getattr(cfg.model, "d_cat", 32),
+            dropout=getattr(cfg.model, "dropout", 0.15),
+            output_dim=cfg.model.output_dim,
+        ).to(device)
+    else:
+        model = StrokeMLP(
+            input_dim=X_train.shape[1],
+            hidden_layers=list(cfg.model.hidden_layers),
+            output_dim=cfg.model.output_dim,
+            dropout=cfg.model.dropout,
+        ).to(device)
+
+    # ── Imbalance Handling: Positive Class Weighting ──────────────────────────
+    # Exact negative-to-positive ratio in train split or config override
+    if hasattr(cfg.training, "pos_weight") and cfg.training.pos_weight is not None:
+        pos_weight_val = float(cfg.training.pos_weight)
+    else:
+        pos_weight_val = float((y_train == 0).sum() / max(1, (y_train == 1).sum()))
+    logger.info("Using BCEWithLogitsLoss pos_weight=%.2f (compensating class imbalance)", pos_weight_val)
+
+    pos_weight = torch.tensor([pos_weight_val], device=device)
     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
-    optimizer = torch.optim.Adam(model.parameters(), lr=cfg.training.learning_rate)
+    optimizer = torch.optim.Adam(
+        model.parameters(), 
+        lr=cfg.training.learning_rate,
+        weight_decay=getattr(cfg.training, "weight_decay", 3e-4)
+    )
 
     # ── MLflow Setup ──────────────────────────────────────────────────────────
-    # Save MLflow data locally using a SQLite database at the project root
     mlflow_db_path = Path(cfg.artefacts.checkpoint_dir).parent.parent / "mlflow.db"
     mlflow.set_tracking_uri(f"sqlite:///{mlflow_db_path.absolute()}")
     mlflow.set_experiment("vena_stroke_prediction")
 
     # ── Epoch Loop with Early Stopping ────────────────────────────────────────
     best_val_loss = float("inf")
+    best_auprc = 0.0
     patience = cfg.training.early_stopping_patience
     patience_counter = 0
 
-    with mlflow.start_run(run_name="StrokeMLP_Run"):
-        # Log configuration parameters
+    with mlflow.start_run(run_name=f"{arch_type}_Run"):
         mlflow.log_params({
+            "architecture": arch_type,
             "learning_rate": cfg.training.learning_rate,
             "batch_size": cfg.training.batch_size,
-            "pos_weight": cfg.training.pos_weight,
+            "pos_weight": pos_weight_val,
             "epochs": cfg.training.epochs,
-            "hidden_layers": str(list(cfg.model.hidden_layers)),
             "dropout": cfg.model.dropout,
             "input_dim": X_train.shape[1],
         })
 
         for epoch in range(1, cfg.training.epochs + 1):
             train_loss = train_one_epoch(model, train_loader, criterion, optimizer, device)
-            val_loss, val_acc, val_f1, val_prec, val_rec, val_auroc = evaluate(
+            val_loss, val_acc, val_f1, val_prec, val_rec, val_auroc, val_auprc = evaluate(
                 model, test_loader, criterion, device
             )
 
@@ -216,25 +255,27 @@ def run_training(cfg: "DictConfig") -> None:
                 "val_precision": val_prec,
                 "val_recall": val_rec,
                 "val_auroc": val_auroc,
+                "val_auprc": val_auprc,
             }, step=epoch)
 
             logger.info(
-                "Epoch %03d | train_loss=%.4f | val_loss=%.4f | val_f1=%.4f | val_auroc=%.4f",
-                epoch, train_loss, val_loss, val_f1, val_auroc
+                "Epoch %03d | train_loss=%.4f | val_loss=%.4f | val_auprc=%.4f | val_auroc=%.4f | val_f1=%.4f",
+                epoch, train_loss, val_loss, val_auprc, val_auroc, val_f1
             )
 
-            # Checkpoint & Early Stopping logic
+            # Checkpoint & Early Stopping logic (optimizing on validation loss)
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
+                best_auprc = val_auprc
                 patience_counter = 0
-                checkpoint_path = save_checkpoint(
+                save_checkpoint(
                     model=model,
                     epoch=epoch,
                     val_loss=val_loss,
                     checkpoint_dir=cfg.artefacts.checkpoint_dir,
                     filename=cfg.artefacts.best_model_name,
                 )
-                
+
                 # Log the best model directly to MLflow with a signature
                 mlflow.pytorch.log_model(
                     model, 
@@ -247,4 +288,4 @@ def run_training(cfg: "DictConfig") -> None:
                     logger.warning("Erken durdurma (Early Stopping) devreye girdi! Epoch: %d", epoch)
                     break
 
-        logger.info("Training complete. Best val_loss=%.4f", best_val_loss)
+        logger.info("Training complete. Best val_loss=%.4f (val_auprc=%.4f)", best_val_loss, best_auprc)

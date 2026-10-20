@@ -23,26 +23,34 @@ data:
 
 # ── Model ─────────────────────────────────────────────────────────────────────
 model:
-  # Number of input features after preprocessing (update after EDA in Phase 2)
-  input_dim: 10
-  # Neuron counts for each hidden layer — drives the MLP constructor dynamically
+  # Blueprint: IEEE 2026 CCAI Dual-Tower Transformer Framework
+  architecture: "DualTowerStrokeTransformer" # Options: DualTowerStrokeTransformer, StrokeMLP
+  # Number of input features after preprocessing
+  input_dim: 19
+  # Transformer Latent Dimensions (Table II from IEEE Paper)
+  d_model: 64
+  nhead: 4
+  num_layers: 2
+  d_cat: 32
+  # Neuron counts for MLP fallback
   hidden_layers:
     - 64
     - 32
   # Output dim is 1 for binary classification with BCEWithLogitsLoss
   output_dim: 1
-  # Dropout probability applied after every hidden layer to regularise training
-  dropout: 0.3
+  # Dropout probability applied to attention and MLP heads
+  dropout: 0.15
 
 # ── Training ──────────────────────────────────────────────────────────────────
 training:
-  learning_rate: 1.0e-3
+  learning_rate: 5.0e-4 # Tuned optimal rate from IEEE paper Table II
   batch_size: 64
   epochs: 50
-  # Patience for early stopping (Phase 2); defined here so it's never hardcoded
+  weight_decay: 3.0e-4
+  # Patience for early stopping
   early_stopping_patience: 10
-  # Weight for positive class to counteract the stroke/no-stroke class imbalance
-  pos_weight: 9.0
+  # Exact class weighting: 4861 negative / 249 positive ≈ 19.52
+  pos_weight: 19.52
 
 # ── Logging & Artefacts ───────────────────────────────────────────────────────
 artefacts:

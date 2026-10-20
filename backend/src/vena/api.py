@@ -5,6 +5,7 @@ Serves the trained StrokeMLP model for real-time inference.
 from contextlib import asynccontextmanager
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import torch
 from fastapi import FastAPI, HTTPException
@@ -16,7 +17,7 @@ import urllib.request
 import random
 
 from vena.data import load_raw_data, preprocess
-from vena.model import StrokeMLP
+from vena.model import DualTowerStrokeTransformer, StrokeMLP
 from vena.dashboard import get_dashboard_html
 
 # Global variables for caching preprocessors and model
@@ -95,15 +96,31 @@ async def lifespan(app: FastAPI):
     if not checkpoint_path.exists():
         raise RuntimeError(f"Model checkpoint not found at {checkpoint_path}.")
     
-    # These match the config.yaml defaults used in Phase 3
-    MODEL = StrokeMLP(
-        input_dim=len(TRAINING_COLUMNS),
-        hidden_layers=[64, 32],
-        output_dim=1,
-        dropout=0.3
-    )
     checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
-    MODEL.load_state_dict(checkpoint["model_state_dict"])
+    state_dict = checkpoint["model_state_dict"]
+
+    if "vital_token_weights" in state_dict or "left_tower.0.weight" in state_dict:
+        MODEL = DualTowerStrokeTransformer(
+            input_dim=len(TRAINING_COLUMNS),
+            numerical_indices=[0, 5, 6],
+            d_model=64,
+            nhead=4,
+            num_layers=2,
+            d_cat=32,
+            dropout=0.15,
+            output_dim=1,
+        )
+        print("🧠 Loaded Dual-Tower Transformer Model (IEEE 2026 Framework)")
+    else:
+        MODEL = StrokeMLP(
+            input_dim=len(TRAINING_COLUMNS),
+            hidden_layers=[64, 32],
+            output_dim=1,
+            dropout=0.3,
+        )
+        print("🧠 Loaded StrokeMLP Model")
+
+    MODEL.load_state_dict(state_dict)
     MODEL.eval()
     
     # Initialize SHAP Explainer
@@ -112,7 +129,10 @@ async def lifespan(app: FastAPI):
     background_df = X_train.sample(n=min(100, len(X_train)), random_state=42)
     background_scaled = SCALER.transform(background_df)
     background_tensor = torch.tensor(background_scaled, dtype=torch.float32)
-    EXPLAINER = shap.DeepExplainer(MODEL, background_tensor)
+    try:
+        EXPLAINER = shap.GradientExplainer(MODEL, background_tensor)
+    except Exception:
+        EXPLAINER = shap.DeepExplainer(MODEL, background_tensor)
     
     print("✅ API is ready for inference with SHAP Explainability!")
     
@@ -339,14 +359,13 @@ def predict(request: Request, patient: PatientData) -> PredictionResult:
     try:
         # Get SHAP values for the single input tensor
         shap_values = EXPLAINER.shap_values(X_tensor)
-        # DeepExplainer returns a list of arrays for PyTorch, or single array
         if isinstance(shap_values, list):
-            contributions = shap_values[0][0]
+            contributions = np.array(shap_values[0]).flatten()
         else:
-            contributions = shap_values[0]
+            contributions = np.array(shap_values).flatten()
             
         feature_impacts = list(zip(TRAINING_COLUMNS, contributions))
-        feature_impacts.sort(key=lambda x: abs(x[1]), reverse=True)
+        feature_impacts.sort(key=lambda x: abs(float(x[1])), reverse=True)
         
         report = "Clinical Analysis Report: "
         if is_high_risk:

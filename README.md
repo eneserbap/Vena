@@ -186,12 +186,13 @@ docker run --gpus all -v $(pwd)/data:/app/data vena-train:latest
 - [x] Responsive Design & Vercel Deployment
 - [x] API Security (Rate Limiting with SlowAPI)
 
-### 🔄 Phase 6 — Explainable AI & Human-in-the-Loop (TÜBİTAK Ready) *(Current)*
-- [ ] Implement SHAP (SHapley Additive exPlanations) for transparent predictions
-- [ ] Generate clinical "Doctor's Report" explaining risk factors mathematically
-- [ ] Out-of-Distribution (OOD) Detection: Warn doctors if input data has low confidence/anomalies
-- [ ] Doctor Feedback Loop (Active Learning): Allow doctors to flag incorrect predictions for future retraining
-- [ ] (Future) Model Monitoring & Data Drift Detection
+### ✅ Phase 6 — Dual-Tower Transformer & Explainable AI (IEEE 2026 Blueprint)
+- [x] **Dual-Tower Transformer (`DualTowerStrokeTransformer`)**: Decoupled categorical embedding tower & numerical vitals Multi-Head Self-Attention tower (IEEE CCAI 2026 framework).
+- [x] **Imbalance Optimization & AUPRC**: Solved the 95-to-5 class imbalance using exact positive weighting (`pos_weight=19.52`) and tracking Area Under the Precision-Recall Curve (**AUPRC**).
+- [x] **Adaptive Runtime Safeguard Layer**: Online sanitization, non-negative clamping, and outlier guarding for zero-crash production inference.
+- [x] **SHAP Explainability (GradientExplainer)**: Transparent predictions extracting exact physiological feature contributions.
+- [x] **Automated Clinical "Doctor's Report"**: Real-time generation of natural language clinical risk explanations for medical practitioners.
+- [ ] (Future) Out-of-Distribution (OOD) active doctor feedback loop
 
 ---
 

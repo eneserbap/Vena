@@ -11,7 +11,7 @@ from __future__ import annotations
 import torch
 import pytest
 
-from vena.model import StrokeMLP
+from vena.model import DualTowerStrokeTransformer, StrokeMLP
 
 
 class TestStrokeMLP:
@@ -62,3 +62,50 @@ class TestStrokeMLP:
         with torch.no_grad():
             out = model(x)
         assert out.shape == (1, 1)
+
+
+class TestDualTowerStrokeTransformer:
+    """Unit tests for the Dual-Tower Transformer (IEEE 2026 CCAI Blueprint)."""
+
+    def test_dual_tower_output_shape(self) -> None:
+        """Forward pass output shape should be (batch_size, 1)."""
+        model = DualTowerStrokeTransformer(input_dim=19, numerical_indices=[0, 5, 6])
+        x = torch.randn(8, 19)
+        out = model(x)
+        assert out.shape == (8, 1), f"Expected (8, 1), got {out.shape}"
+
+    def test_dual_tower_deterministic_eval(self) -> None:
+        """Eval mode forward pass must be deterministic."""
+        model = DualTowerStrokeTransformer(input_dim=19, numerical_indices=[0, 5, 6], dropout=0.3)
+        model.eval()
+        x = torch.randn(4, 19)
+        with torch.no_grad():
+            out1 = model(x)
+            out2 = model(x)
+        assert torch.allclose(out1, out2), "Eval mode forward is not deterministic"
+
+    def test_runtime_safeguard_handles_anomalies(self) -> None:
+        """Adaptive Runtime Safeguard must catch NaNs and Infs without crashing."""
+        model = DualTowerStrokeTransformer(input_dim=19, numerical_indices=[0, 5, 6])
+        model.eval()
+        # Create tensor with NaN and Inf outliers
+        corrupted_x = torch.randn(4, 19)
+        corrupted_x[0, 0] = float("nan")
+        corrupted_x[1, 5] = float("inf")
+        corrupted_x[2, 6] = float("-inf")
+
+        with torch.no_grad():
+            out = model(corrupted_x)
+        assert not torch.isnan(out).any(), "Output contains NaN after safeguard!"
+        assert not torch.isinf(out).any(), "Output contains Inf after safeguard!"
+        assert out.shape == (4, 1)
+
+    def test_single_sample_inference(self) -> None:
+        """Model must support single patient inference at runtime without BatchNorm error."""
+        model = DualTowerStrokeTransformer(input_dim=19, numerical_indices=[0, 5, 6])
+        model.eval()
+        single_patient = torch.randn(1, 19)
+        with torch.no_grad():
+            out = model(single_patient)
+        assert out.shape == (1, 1)
+
