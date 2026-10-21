@@ -20,9 +20,8 @@ from pathlib import Path
 import pandas as pd
 import torch
 from sklearn.model_selection import train_test_split  # type: ignore[import]
-from sklearn.preprocessing import StandardScaler      # type: ignore[import]
+from sklearn.preprocessing import StandardScaler  # type: ignore[import]
 from torch.utils.data import DataLoader, TensorDataset
-
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Public API
@@ -50,7 +49,7 @@ def load_raw_data(csv_path: str | Path) -> pd.DataFrame:
     path = Path(csv_path)
     if not path.exists():
         raise FileNotFoundError(f"Veri seti bulunamadı: {path}")
-    
+
     return pd.read_csv(path)
 
 
@@ -99,7 +98,7 @@ def preprocess(
     # Nominal variables -> One-Hot Encoding
     categorical_cols = ["gender", "work_type", "smoking_status"]
     existing_cat_cols = [c for c in categorical_cols if c in df.columns]
-    
+
     df = pd.get_dummies(df, columns=existing_cat_cols, drop_first=False)
 
     # Separate features and target
@@ -145,17 +144,17 @@ def split_and_scale(
     )
 
     scaler = StandardScaler()
-    
+
     # Scale only based on training data to avoid data leakage
     X_train_scaled = pd.DataFrame(
-        scaler.fit_transform(X_train), 
-        columns=X_train.columns, 
+        scaler.fit_transform(X_train),
+        columns=X_train.columns,
         index=X_train.index
     )
-    
+
     X_test_scaled = pd.DataFrame(
-        scaler.transform(X_test), 
-        columns=X_test.columns, 
+        scaler.transform(X_test),
+        columns=X_test.columns,
         index=X_test.index
     )
 
@@ -189,7 +188,7 @@ def build_dataloaders(
     # Convert to PyTorch tensors
     X_train_t = torch.tensor(X_train.values, dtype=torch.float32)
     y_train_t = torch.tensor(y_train.values, dtype=torch.float32).unsqueeze(1)
-    
+
     X_test_t = torch.tensor(X_test.values, dtype=torch.float32)
     y_test_t = torch.tensor(y_test.values, dtype=torch.float32).unsqueeze(1)
 

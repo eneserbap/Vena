@@ -2,6 +2,9 @@
 
 Serves the trained StrokeMLP model for real-time inference.
 """
+import asyncio
+import random
+import urllib.request
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -12,13 +15,10 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-import asyncio
-import urllib.request
-import random
 
+from vena.dashboard import get_dashboard_html
 from vena.data import load_raw_data, preprocess
 from vena.model import DualTowerStrokeTransformer, StrokeMLP
-from vena.dashboard import get_dashboard_html
 
 # Global variables for caching preprocessors and model
 MODEL = None
@@ -41,8 +41,9 @@ class PredictionResult(BaseModel):
     stroke_risk_percentage: float
     is_high_risk: bool
     doctors_report: str
-    
+
 import shap
+
 EXPLAINER = None
 
 
@@ -73,29 +74,29 @@ async def lifespan(app: FastAPI):
     global MODEL, SCALER, TRAINING_COLUMNS
 
     print("🚀 Loading preprocessors and model...")
-    # NOTE: In a fully separated production environment, you would load `scaler.pkl` 
+    # NOTE: In a fully separated production environment, you would load `scaler.pkl`
     # and `columns.pkl` directly from MLflow or an S3 bucket.
     # For this phase, we reconstruct the exact training scaler dynamically on startup.
-    
+
     raw_path = Path("data/raw/healthcare-dataset-stroke-data.csv")
     if not raw_path.exists():
         raise RuntimeError(f"Raw data not found at {raw_path}.")
-    
+
     # Reconstruct training features
     df = load_raw_data(raw_path)
     X, y = preprocess(df, "stroke", ["id"])
     X_train, _, _, _ = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
-    
+
     # Save the expected column layout and fit the scaler
     TRAINING_COLUMNS = X_train.columns
     SCALER = StandardScaler()
     SCALER.fit(X_train)
-    
+
     # Load the trained PyTorch model
     checkpoint_path = Path("outputs/checkpoints/vena_best.pt")
     if not checkpoint_path.exists():
         raise RuntimeError(f"Model checkpoint not found at {checkpoint_path}.")
-    
+
     checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
     state_dict = checkpoint["model_state_dict"]
 
@@ -122,36 +123,41 @@ async def lifespan(app: FastAPI):
 
     MODEL.load_state_dict(state_dict)
     MODEL.eval()
-    
+
     # Initialize SHAP Explainer
     global EXPLAINER
-    # Select 100 random samples as background for SHAP to baseline against
-    background_df = X_train.sample(n=min(100, len(X_train)), random_state=42)
+    # Select 15 random samples as background for SHAP (keeps latency <0.05s and RAM minimal)
+    background_df = X_train.sample(n=min(15, len(X_train)), random_state=42)
     background_scaled = SCALER.transform(background_df)
     background_tensor = torch.tensor(background_scaled, dtype=torch.float32)
     try:
         EXPLAINER = shap.GradientExplainer(MODEL, background_tensor)
     except Exception:
         EXPLAINER = shap.DeepExplainer(MODEL, background_tensor)
-    
-    print("✅ API is ready for inference with SHAP Explainability!")
-    
+
+    # Free large memory allocations from startup to keep Render RSS RAM well under 250MB
+    del df, X, y, X_train, background_df, background_scaled
+    import gc
+    gc.collect()
+
+    print("✅ API is ready for inference with ultra-fast SHAP Explainability!")
+
     # 🕵️‍♂️ Start the Anti-Sleep Hack in the background
     ping_task = asyncio.create_task(anti_sleep_ping())
-    
+
     yield
-    
+
     ping_task.cancel()
     print("🛑 Shutting down API...")
 
 
-from fastapi.responses import HTMLResponse
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 
 app = FastAPI(
     title="VENA PROJECT API",
@@ -319,75 +325,77 @@ def predict(request: Request, patient: PatientData) -> PredictionResult:
     """Predict the stroke risk for a given patient."""
     if MODEL is None or SCALER is None or TRAINING_COLUMNS is None:
         raise HTTPException(status_code=503, detail="Model is not loaded.")
-        
+
     patient_dict = patient.model_dump()
     # Add omitted fields back so the pipeline can process them correctly without crashing
     patient_dict["ever_married"] = "Yes"
     patient_dict["work_type"] = "Private"
-    
+
     # 1. Convert input to DataFrame
     df = pd.DataFrame([patient_dict])
-    
+
     # 2. Preprocess exactly as in data.py
     df["ever_married"] = df["ever_married"].map({"Yes": 1, "No": 0})
     df["Residence_type"] = df["Residence_type"].map({"Urban": 1, "Rural": 0})
-    
+
     categorical_cols = ["gender", "work_type", "smoking_status"]
     df = pd.get_dummies(df, columns=categorical_cols)
-    
+
     # 3. Align columns with training data (add missing, drop extra)
     for col in TRAINING_COLUMNS:
         if col not in df.columns:
             df[col] = 0
-            
+
     df = df[TRAINING_COLUMNS]
     df = df.astype(float)
-    
+
     # 4. Scale
     X_scaled = SCALER.transform(df)
-    
+
     # 5. Predict with PyTorch
     X_tensor = torch.tensor(X_scaled, dtype=torch.float32)
     with torch.no_grad():
         logits = MODEL(X_tensor)
         prob = torch.sigmoid(logits).item()
-        
+
     risk_percentage = prob * 100
-    is_high_risk = prob > 0.5 
-    
+    is_high_risk = prob > 0.5
+
     # 6. SHAP Explainability (Doctor's Report)
-    try:
-        # Get SHAP values for the single input tensor
-        shap_values = EXPLAINER.shap_values(X_tensor)
-        if isinstance(shap_values, list):
-            contributions = np.array(shap_values[0]).flatten()
-        else:
-            contributions = np.array(shap_values).flatten()
-            
-        feature_impacts = list(zip(TRAINING_COLUMNS, contributions))
-        feature_impacts.sort(key=lambda x: abs(float(x[1])), reverse=True)
-        
-        report = "Clinical Analysis Report: "
-        if is_high_risk:
-            report += f"The system has detected a significantly elevated stroke risk of {risk_percentage:.1f}%. "
-        else:
-            report += f"The patient's stroke risk is currently at a low level ({risk_percentage:.1f}%). "
-            
-        top_positives = [f for f in feature_impacts if f[1] > 0][:2]
-        top_negatives = [f for f in feature_impacts if f[1] < 0][:2]
-        
-        if top_positives:
-            factors = ", ".join([f[0].replace("_", " ").title() for f in top_positives])
-            report += f"The primary factors increasing this risk are: {factors}. "
-        if top_negatives:
-            factors = ", ".join([f[0].replace("_", " ").title() for f in top_negatives])
-            report += f"The protective factors reducing this risk are: {factors}. "
-            
-        report += "This mathematical analysis is generated using SHAP (Explainable AI)."
-    except Exception as e:
-        report = "The Explainable AI (SHAP) report could not be generated at this time."
-        print(f"SHAP Error: {e}")
-    
+    report = "The Explainable AI (SHAP) report could not be generated at this time."
+    if EXPLAINER is not None:
+        try:
+            # Get SHAP values for the single input tensor
+            shap_values = EXPLAINER.shap_values(X_tensor)
+            if isinstance(shap_values, list):
+                contributions = np.array(shap_values[0]).flatten()
+            else:
+                contributions = np.array(shap_values).flatten()
+
+            feature_impacts = list(zip(TRAINING_COLUMNS, contributions))
+            feature_impacts.sort(key=lambda x: abs(float(x[1])), reverse=True)
+
+            report = "Clinical Analysis Report: "
+            if is_high_risk:
+                report += f"The system has detected a significantly elevated stroke risk of {risk_percentage:.1f}%. "
+            else:
+                report += f"The patient's stroke risk is currently at a low level ({risk_percentage:.1f}%). "
+
+            top_positives = [f for f in feature_impacts if f[1] > 0][:2]
+            top_negatives = [f for f in feature_impacts if f[1] < 0][:2]
+
+            if top_positives:
+                factors = ", ".join([f[0].replace("_", " ").title() for f in top_positives])
+                report += f"The primary factors increasing this risk are: {factors}. "
+            if top_negatives:
+                factors = ", ".join([f[0].replace("_", " ").title() for f in top_negatives])
+                report += f"The protective factors reducing this risk are: {factors}. "
+
+            report += "This mathematical analysis is generated using SHAP (Explainable AI)."
+        except Exception as e:
+            report = "The Explainable AI (SHAP) report could not be generated at this time."
+            print(f"SHAP Error: {e}")
+
     return PredictionResult(
         stroke_risk_percentage=round(risk_percentage, 2),
         is_high_risk=is_high_risk,

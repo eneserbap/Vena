@@ -163,7 +163,7 @@ def save_checkpoint(
     return checkpoint_path
 
 
-def run_training(cfg: "DictConfig") -> None:
+def run_training(cfg: DictConfig) -> None:
     from vena.data import build_dataloaders, load_raw_data, preprocess, split_and_scale
     from vena.model import DualTowerStrokeTransformer, StrokeMLP
 
@@ -213,7 +213,7 @@ def run_training(cfg: "DictConfig") -> None:
     pos_weight = torch.tensor([pos_weight_val], device=device)
     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
     optimizer = torch.optim.Adam(
-        model.parameters(), 
+        model.parameters(),
         lr=cfg.training.learning_rate,
         weight_decay=getattr(cfg.training, "weight_decay", 3e-4)
     )
@@ -278,8 +278,8 @@ def run_training(cfg: "DictConfig") -> None:
 
                 # Log the best model directly to MLflow with a signature
                 mlflow.pytorch.log_model(
-                    model, 
-                    "best_model", 
+                    model,
+                    "best_model",
                     input_example=X_train.iloc[:1].to_numpy(dtype="float32")
                 )
             else:
