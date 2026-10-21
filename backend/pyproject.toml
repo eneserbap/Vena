@@ -23,7 +23,6 @@ dependencies = [
     "shap>=0.51.0",
     "slowapi>=0.1.10",
     "torch>=2.14.0",
-    "torchvision>=0.29.0",
     "typer>=0.27.2",
     "uvicorn>=0.54.0",
 ]

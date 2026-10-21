@@ -11,6 +11,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
+torch.set_num_threads(1)
+torch.set_num_interop_threads(1)
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from sklearn.model_selection import train_test_split

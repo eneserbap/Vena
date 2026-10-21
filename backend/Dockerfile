@@ -6,6 +6,13 @@ FROM python:3.11-slim
 # Install 'uv' for blazing fast package installation
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
+# Optimize for low-RAM cloud containers (Render 512MB limit)
+ENV UV_TORCH_BACKEND=cpu \
+    PYTHONUNBUFFERED=1 \
+    OMP_NUM_THREADS=1 \
+    MKL_NUM_THREADS=1 \
+    OPENBLAS_NUM_THREADS=1
+
 # Set the working directory inside the container
 WORKDIR /app
 
@@ -16,7 +23,7 @@ COPY pyproject.toml uv.lock ./
 # so that `uv` can find `src/vena/__init__.py` to build the package.
 COPY . .
 
-# Install dependencies system-wide (since we are isolated in a container anyway)
+# Install dependencies with PyTorch CPU backend (drops RAM footprint by ~400MB)
 RUN uv pip install --system --no-cache -e .
 
 # Expose the port that FastAPI will run on
