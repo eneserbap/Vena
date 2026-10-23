@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 export default function ApiDocs() {
   return (
-    <section className="py-24 px-10 bg-[#0a0a0b] flex justify-center overflow-hidden">
+    <section className="py-16 md:py-24 px-4 sm:px-8 md:px-10 bg-[#0a0a0b] flex justify-center overflow-hidden">
       <div className="max-w-6xl w-full flex flex-col items-center">
         
         <motion.div 

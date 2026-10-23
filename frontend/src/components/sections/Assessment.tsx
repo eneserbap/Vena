@@ -84,7 +84,7 @@ export default function Assessment() {
 
   return (
     <>
-      <section id="assessment" className="min-h-screen bg-[#F8F9FA] py-24 px-10 relative flex justify-center items-center print:hidden">
+      <section id="assessment" className="min-h-screen bg-[#F8F9FA] py-16 md:py-24 px-4 sm:px-8 md:px-10 relative flex justify-center items-center print:hidden">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-gradient-to-bl from-purple-200/50 to-blue-200/50 blur-[120px] pointer-events-none -z-10"></div>
       
       <div className="max-w-4xl w-full relative z-10">
@@ -95,7 +95,7 @@ export default function Assessment() {
           transition={{ duration: 1 }}
           className="text-center mb-16"
         >
-          <h2 className="text-5xl font-medium text-gray-900 mb-6">Your Source for Knowledge and Insights</h2>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium text-gray-900 mb-4 md:mb-6">Your Source for Knowledge and Insights</h2>
           <p className="text-lg text-gray-500 max-w-2xl mx-auto">Enter your clinical parameters to receive an instant, AI-driven assessment of your stroke risk profile.</p>
         </motion.div>
 
@@ -104,7 +104,7 @@ export default function Assessment() {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 1, delay: 0.2 }}
-          className="bg-white/80 backdrop-blur-2xl border border-white shadow-[0_20px_60px_rgb(0,0,0,0.05)] rounded-[3rem] p-12 relative"
+          className="bg-white/80 backdrop-blur-2xl border border-white shadow-[0_20px_60px_rgb(0,0,0,0.05)] rounded-[2rem] md:rounded-[3rem] p-6 sm:p-8 md:p-12 relative"
         >
           {!result ? (
             <form onSubmit={handleSubmit} className="relative z-10">
@@ -203,10 +203,10 @@ export default function Assessment() {
               <span className="text-sm font-bold uppercase tracking-[0.2em] text-gray-400 mb-6 block">Stroke Risk Probability</span>
               
               <div className="flex items-baseline justify-center gap-2 mb-8">
-                <span className={`text-[10rem] font-light tracking-tighter leading-none ${result.is_high_risk ? 'text-rose-500' : 'text-gray-900'}`}>
+                <span className={`text-[5rem] sm:text-[7rem] md:text-[10rem] font-light tracking-tighter leading-none ${result.is_high_risk ? 'text-rose-500' : 'text-gray-900'}`}>
                   {result.stroke_risk_percentage.toFixed(1)}
                 </span>
-                <span className="text-4xl font-medium text-gray-300">%</span>
+                <span className="text-2xl sm:text-4xl font-medium text-gray-300">%</span>
               </div>
 
               <div className="w-full h-4 bg-gray-100 rounded-full overflow-hidden mt-2 p-0.5 border border-gray-200">

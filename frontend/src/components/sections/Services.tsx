@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 export default function Services() {
   return (
-    <section id="services" className="py-24 bg-[#fbfaf8] flex flex-col items-center px-10">
+    <section id="services" className="py-16 md:py-24 bg-[#fbfaf8] flex flex-col items-center px-4 sm:px-8 md:px-10">
       
       {/* Top Badge */}
 
@@ -20,7 +20,7 @@ export default function Services() {
       </motion.h2>
 
       {/* 4-Column Masonry Grid exactly matching the design */}
-      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-4 gap-4 h-auto md:h-[600px]">
+      <div className="w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         
         {/* Column 1: Tall Card */}
         <motion.div 
@@ -28,7 +28,7 @@ export default function Services() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="col-span-1 h-[400px] md:h-full rounded-[2rem] relative overflow-hidden bg-[#516b84] shadow-lg group"
+          className="col-span-1 h-[320px] sm:h-[400px] md:h-[600px] rounded-[2rem] relative overflow-hidden bg-[#516b84] shadow-lg group"
         >
           <img src="https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?q=80&w=800&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-multiply group-hover:scale-105 transition-transform duration-700" alt="Tech Architecture" />
           <div className="absolute bottom-4 left-4 right-4 bg-white rounded-[1.5rem] p-6 text-center shadow-xl">
@@ -39,7 +39,7 @@ export default function Services() {
         </motion.div>
 
         {/* Column 2: Two Stacked Cards */}
-        <div className="col-span-1 h-[500px] md:h-full flex flex-col gap-4">
+        <div className="col-span-1 h-[500px] sm:h-[500px] md:h-[600px] flex flex-col gap-4">
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -72,7 +72,7 @@ export default function Services() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="col-span-1 h-[400px] md:h-full rounded-[2rem] relative overflow-hidden bg-[#455f75] shadow-lg group"
+          className="col-span-1 h-[320px] sm:h-[400px] md:h-[600px] rounded-[2rem] relative overflow-hidden bg-[#455f75] shadow-lg group"
         >
           <img src="https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?q=80&w=800&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-multiply group-hover:scale-105 transition-transform duration-700" alt="Medical Scan" />
           <div className="absolute bottom-4 left-4 right-4 bg-white rounded-[1.5rem] p-6 text-center shadow-xl">
@@ -88,7 +88,7 @@ export default function Services() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="col-span-1 h-[400px] md:h-full rounded-[2rem] relative overflow-hidden bg-slate-800 shadow-lg group"
+          className="col-span-1 h-[320px] sm:h-[400px] md:h-[600px] rounded-[2rem] relative overflow-hidden bg-slate-800 shadow-lg group"
         >
           <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-multiply group-hover:scale-105 transition-transform duration-700" alt="Code Data" />
           <div className="absolute bottom-4 left-4 right-4 bg-white rounded-[1.5rem] p-6 text-center shadow-xl">

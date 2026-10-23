@@ -25,8 +25,8 @@ export default function Hero() {
         />
       </motion.div>
 
-      {/* Massive Foreground Text - Responsive SVG Text that scales mathematically to 100% container width with zero clipping */}
-      <div className="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[92vw] max-w-[1700px] justify-center pointer-events-none z-10">
+      {/* Massive Foreground Text - Desktop / Laptop Widescreen (1-Line Scaled SVG) */}
+      <div className="hidden lg:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-[1600px] justify-center pointer-events-none z-10 px-4">
         <svg viewBox="0 0 1400 220" className="w-full h-auto overflow-visible select-none" fill="none">
           <text 
             x="50%" 
@@ -43,17 +43,17 @@ export default function Hero() {
         <span className="sr-only">VENA PROJECT - Real-time Explainable AI & Deep Learning for Stroke Risk Prediction by Monolith Studios</span>
       </div>
 
-      {/* Massive Foreground Text - Mobile (Clean proportional 2-line layout) */}
-      <div className="flex md:hidden absolute inset-0 flex-col justify-between pt-[130px] pb-[160px] pointer-events-none z-10 px-4" aria-hidden="true">
-        <div className="text-[clamp(4rem,18vw,5.5rem)] font-bold text-[#d0ff5a] tracking-tighter leading-none text-center opacity-90">
+      {/* Massive Foreground Text - Tablets & Mobile Portrait (iPad Mini, iPad Air, iPad Pro, Phones) */}
+      <div className="flex lg:hidden absolute inset-0 flex-col justify-between pt-[15%] pb-[20%] pointer-events-none z-10 px-6" aria-hidden="true">
+        <div className="text-[clamp(3.5rem,13vw,6.5rem)] font-bold text-[#d0ff5a] tracking-tighter leading-none text-center opacity-90">
           VENA
         </div>
-        <div className="text-[clamp(4rem,18vw,5.5rem)] font-bold text-[#d0ff5a] tracking-tighter leading-none text-center opacity-90">
+        <div className="text-[clamp(3.5rem,13vw,6.5rem)] font-bold text-[#d0ff5a] tracking-tighter leading-none text-center opacity-90">
           PROJECT
         </div>
       </div>
 
-      <div className="absolute bottom-6 md:bottom-12 lg:bottom-16 left-1/2 -translate-x-1/2 z-30">
+      <div className="absolute bottom-8 lg:bottom-14 left-1/2 -translate-x-1/2 z-30">
          <motion.a 
            href="#assessment"
            initial={{ opacity: 0, y: 20 }}

@@ -5,7 +5,7 @@ import { Settings, Box } from 'lucide-react';
 
 export default function About() {
   return (
-    <section id="about" className="py-24 px-10 bg-[#fbfaf8] flex justify-center overflow-hidden">
+    <section id="about" className="py-16 md:py-24 px-4 sm:px-8 md:px-10 bg-[#fbfaf8] flex justify-center overflow-hidden">
       <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         
         {/* Text Side */}
@@ -56,7 +56,7 @@ export default function About() {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="relative h-[600px] w-full rounded-[2rem] bg-gradient-to-b from-[#5c778e] to-[#455f75] p-8 flex flex-col justify-between shadow-2xl overflow-hidden border border-white/20"
+          className="relative h-auto min-h-[400px] md:h-[600px] w-full rounded-[2rem] md:rounded-[2rem] bg-gradient-to-b from-[#5c778e] to-[#455f75] p-6 md:p-8 flex flex-col justify-between shadow-2xl overflow-hidden border border-white/20"
         >
           {/* Abstract background elements */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
@@ -83,10 +83,10 @@ export default function About() {
                  whileInView={{ opacity: 1, y: 0 }}
                  viewport={{ once: true }}
                  transition={{ delay: 0.5 + (i * 0.1) }}
-                 className="bg-white/10 backdrop-blur-md rounded-xl p-4 flex justify-between items-center border border-white/10"
+                 className="bg-white/10 backdrop-blur-md rounded-xl p-3 md:p-4 flex justify-between items-center border border-white/10 overflow-hidden gap-2"
                >
-                 <span className="text-white text-sm font-mono">{item.step}</span>
-                 <span className="text-[#d0ff5a] text-xs font-mono">{item.time}</span>
+                 <span className="text-white text-[10px] sm:text-sm font-mono truncate">{item.step}</span>
+                 <span className="text-[#d0ff5a] text-xs font-mono shrink-0 ml-2">{item.time}</span>
                </motion.div>
              ))}
 
