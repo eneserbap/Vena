@@ -25,12 +25,22 @@ export default function Hero() {
         />
       </motion.div>
 
-      {/* Massive Foreground Text - Fluid Typography scaling seamlessly from tablet to 4K */}
-      <div className="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full justify-center pointer-events-none z-10 px-6">
-        <h1 className="text-[clamp(4.5rem,10.8vw,14rem)] font-bold text-[#d0ff5a] tracking-tighter leading-none whitespace-nowrap opacity-90 text-center max-w-full">
-          VENA PROJECT
-          <span className="sr-only"> - Real-time Explainable AI & Deep Learning for Stroke Risk Prediction by Monolith Studios</span>
-        </h1>
+      {/* Massive Foreground Text - Responsive SVG Text that scales mathematically to 100% container width with zero clipping */}
+      <div className="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[92vw] max-w-[1700px] justify-center pointer-events-none z-10">
+        <svg viewBox="0 0 1400 220" className="w-full h-auto overflow-visible select-none" fill="none">
+          <text 
+            x="50%" 
+            y="55%" 
+            dominantBaseline="middle" 
+            textAnchor="middle" 
+            fill="#d0ff5a" 
+            className="font-bold tracking-tighter opacity-90"
+            style={{ fontSize: '185px', fontFamily: 'inherit', fontWeight: 900 }}
+          >
+            VENA PROJECT
+          </text>
+        </svg>
+        <span className="sr-only">VENA PROJECT - Real-time Explainable AI & Deep Learning for Stroke Risk Prediction by Monolith Studios</span>
       </div>
 
       {/* Massive Foreground Text - Mobile (Clean proportional 2-line layout) */}
