@@ -15,41 +15,41 @@ export default function Hero() {
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:60px_60px] pointer-events-none z-0"></div>
 
       {/* 3D Heart Image (Background) */}
-      <motion.div style={{ y: backgroundY }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] md:w-[700px] md:h-[700px] flex justify-center items-center pointer-events-none mix-blend-screen z-0 opacity-50">
+      <motion.div style={{ y: backgroundY }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] sm:w-[380px] sm:h-[380px] md:w-[500px] md:h-[500px] lg:w-[620px] lg:h-[620px] max-w-[85vw] max-h-[75vh] flex justify-center items-center pointer-events-none mix-blend-screen z-0 opacity-50">
         <motion.img 
           src="/heart.jpg" 
           alt="3D Heart"
-          className="w-full h-full object-cover brightness-110"
+          className="w-full h-full object-contain brightness-110"
           animate={{ scale: [1, 1.03, 1] }}
           transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
         />
       </motion.div>
 
-      {/* Massive Foreground Text - Desktop */}
-      <div className="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full justify-center pointer-events-none z-10 px-4">
-        <h1 className="text-[10rem] xl:text-[14rem] font-bold text-[#d0ff5a] tracking-tighter leading-none whitespace-nowrap opacity-90 text-center">
+      {/* Massive Foreground Text - Fluid Typography scaling seamlessly from tablet to 4K */}
+      <div className="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full justify-center pointer-events-none z-10 px-6">
+        <h1 className="text-[clamp(4.5rem,10.8vw,14rem)] font-bold text-[#d0ff5a] tracking-tighter leading-none whitespace-nowrap opacity-90 text-center max-w-full">
           VENA PROJECT
           <span className="sr-only"> - Real-time Explainable AI & Deep Learning for Stroke Risk Prediction by Monolith Studios</span>
         </h1>
       </div>
 
-      {/* Massive Foreground Text - Mobile (Visual only) */}
-      <div className="flex md:hidden absolute inset-0 flex-col justify-between pt-[140px] pb-[160px] pointer-events-none z-10 px-4" aria-hidden="true">
-        <div className="text-8xl font-bold text-[#d0ff5a] tracking-tighter leading-none text-center opacity-90">
+      {/* Massive Foreground Text - Mobile (Clean proportional 2-line layout) */}
+      <div className="flex md:hidden absolute inset-0 flex-col justify-between pt-[130px] pb-[160px] pointer-events-none z-10 px-4" aria-hidden="true">
+        <div className="text-[clamp(4rem,18vw,5.5rem)] font-bold text-[#d0ff5a] tracking-tighter leading-none text-center opacity-90">
           VENA
         </div>
-        <div className="text-8xl font-bold text-[#d0ff5a] tracking-tighter leading-none text-center opacity-90">
+        <div className="text-[clamp(4rem,18vw,5.5rem)] font-bold text-[#d0ff5a] tracking-tighter leading-none text-center opacity-90">
           PROJECT
         </div>
       </div>
 
-      <div className="absolute bottom-6 md:bottom-auto md:top-1/2 left-1/2 -translate-x-1/2 md:translate-y-[340px] z-30">
+      <div className="absolute bottom-6 md:bottom-12 lg:bottom-16 left-1/2 -translate-x-1/2 z-30">
          <motion.a 
            href="#assessment"
            initial={{ opacity: 0, y: 20 }}
            animate={{ opacity: 1, y: 0 }}
            transition={{ delay: 0.3 }}
-           className="bg-[#d0ff5a] text-[#2c3e50] px-8 py-3 rounded-full font-bold text-sm shadow-[0_0_30px_rgba(208,255,90,0.4)] hover:scale-110 transition-transform flex items-center gap-2 inline-flex"
+           className="bg-[#d0ff5a] text-[#2c3e50] px-8 py-3 rounded-full font-bold text-sm shadow-[0_0_30px_rgba(208,255,90,0.4)] hover:scale-110 transition-transform flex items-center gap-2 inline-flex whitespace-nowrap"
          >
            Start Assessment <ArrowUpRight className="w-4 h-4" />
          </motion.a>
